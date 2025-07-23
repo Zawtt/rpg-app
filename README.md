@@ -1,12 +1,50 @@
-# React + Vite
+# 🧙‍♂️ Ficha de RPG — Projeto em React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![badge](https://img.shields.io/badge/React-Vite-blue?style=for-the-badge) ![status](https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge) ![tech](https://img.shields.io/badge/RPG-Ficha-red?style=for-the-badge)
 
-Currently, two official plugins are available:
+## 🎲 Sobre o Projeto
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Ficha de RPG** é um projeto interativo criado com **React + Vite** que simula uma ficha completa de personagem para RPGs de mesa. O objetivo é oferecer uma experiência prática, moderna e visualmente intuitiva para jogadores gerenciarem seus personagens com facilidade!
 
-## Expanding the ESLint configuration
+> ✨ Ideal para campanhas, combates, rolagens de dados e gerenciamento de habilidades!
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 🚀 Tecnologias Utilizadas
+
+- ⚛️ React
+- ⚡ Vite
+- 🎨 CSS3 (puro)
+- 🧠 JavaScript
+
+---
+
+## 🔮 Funcionalidades (em desenvolvimento)
+
+- [x] Cadastro de personagem (nome, raça, idade, altura, etc)
+- [x] Contador de turnos
+- [x] Rolagem de dados com feedback visual
+- [x] Lista de magias e habilidades
+- [x] Inventário interativo
+- [ ] Sistema de status (HP, Mana, Buffs/Debuffs)
+- [ ] Salvamento local das fichas
+- [ ] Tema personalizado por jogador
+
+---
+
+## 🧪 Como Executar
+
+Clone o projeto e siga os passos abaixo:
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/seu-repo.git
+
+# Acesse a pasta
+cd nome-do-projeto
+
+# Instale as dependências
+npm install
+
+# Rode o projeto
+npm run dev
