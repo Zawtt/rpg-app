@@ -38,7 +38,7 @@ Clone o projeto e siga os passos abaixo:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/seu-repo.git
+git clone https://github.com/Zawtt/rpg-app.git
 
 # Acesse a pasta
 cd nome-do-projeto
