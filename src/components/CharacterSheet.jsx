@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-// CharacterSheet agora recebe characterData e setCharacterData como props
-function CharacterSheet({ characterData, setCharacterData }) {
+// CharacterSheet agora recebe characterData, setCharacterData E onFixAttributes como props
+function CharacterSheet({ characterData, setCharacterData, onFixAttributes }) {
   // Desestruturar os dados da ficha para os estados locais
   const {
     name, race, height, age, homeland, religion, fear,
@@ -43,9 +43,38 @@ function CharacterSheet({ characterData, setCharacterData }) {
     updateCharacterField('failureBoxes', newBoxes);
   };
 
+  // ATUALIZADO: Função para coletar e fixar APENAS os atributos desejados
+  const handleFixAttributes = () => {
+    const attributesToFix = [];
+    // Mapeamento de chaves de estado para nomes amigáveis para exibição
+    // APENAS os atributos que você quer fixar
+    const attributeMap = {
+      hp: 'HP', mana: 'MANA', aura: 'AURA', er: 'ER', en: 'EN', ep: 'EP', ea: 'EA',
+    };
+
+    // Coleta APENAS os campos específicos
+    const fieldsToCollect = ['hp', 'mana', 'aura', 'er', 'en', 'ep', 'ea'];
+
+    fieldsToCollect.forEach(field => {
+      const value = characterData[field];
+      // Verifica se o valor não está vazio, nulo ou indefinido
+      // E converte para número se for um campo numérico, para evitar strings vazias sendo fixadas
+      if (value !== '' && value !== null && value !== undefined) {
+        attributesToFix.push({
+          name: attributeMap[field], // Usa o nome amigável
+          value: parseFloat(value) || value // Converte para número se possível, senão mantém o valor original
+        });
+      }
+    });
+
+    // Chama a função passada via props para atualizar o estado no componente pai (App.jsx)
+    if (onFixAttributes) {
+      onFixAttributes(attributesToFix);
+    }
+  };
+
+
   // Define as classes de estilo para os inputs de status com base na imagem
-  // A classe placeholder-gray-500 foi mantida no className, mas sem o atributo placeholder, ela não tem efeito.
-  // Você pode removê-la se quiser, mas não é estritamente necessário.
   const statusInputClass = (colorClass) => `w-full p-2 bg-gray-900 border-2 rounded-md focus:outline-none focus:ring-2 text-white placeholder-gray-500 ${colorClass}`;
   const statusLabelClass = (colorClass) => `block text-sm font-bold mb-1 ${colorClass}`;
 
@@ -86,7 +115,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="name"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Nome do Personagem"
                 value={name}
                 onChange={(e) => updateCharacterField('name', e.target.value)}
               />
@@ -97,7 +125,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="religion"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Crença do personagem"
                 value={religion}
                 onChange={(e) => updateCharacterField('religion', e.target.value)}
               />
@@ -108,7 +135,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="height"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Ex: 1.80m"
                 value={height}
                 onChange={(e) => updateCharacterField('height', e.target.value)}
               />
@@ -119,7 +145,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="race"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Ex: Elfo, Anão, Humano"
                 value={race}
                 onChange={(e) => updateCharacterField('race', e.target.value)}
               />
@@ -130,7 +155,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="number"
                 id="age"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Ex: 30"
                 value={age}
                 onChange={(e) => updateCharacterField('age', e.target.value)}
               />
@@ -141,7 +165,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="fear"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Medo mais profundo"
                 value={fear}
                 onChange={(e) => updateCharacterField('fear', e.target.value)}
               />
@@ -152,7 +175,6 @@ function CharacterSheet({ characterData, setCharacterData }) {
                 type="text"
                 id="homeland"
                 className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-500"
-                // REMOVIDO: placeholder="Onde seu personagem nasceu"
                 value={homeland}
                 onChange={(e) => updateCharacterField('homeland', e.target.value)}
               />
@@ -167,44 +189,46 @@ function CharacterSheet({ characterData, setCharacterData }) {
           <div>
             <label htmlFor="hp" className={statusLabelClass('text-red-400')}>HP:</label>
             <input type="number" id="hp" className={statusInputClass('border-red-500 focus:ring-red-500')}
-              // REMOVIDO: placeholder="Saúde Atual"
               value={hp} onChange={(e) => updateCharacterField('hp', e.target.value)} />
           </div>
           <div>
             <label htmlFor="en" className={statusLabelClass('text-blue-400')}>EN:</label>
             <input type="number" id="en" className={statusInputClass('border-blue-500 focus:ring-blue-500')}
-              // REMOVIDO: placeholder="Resistência Natural"
               value={en} onChange={(e) => updateCharacterField('en', e.target.value)} />
           </div>
           <div>
             <label htmlFor="mana" className={statusLabelClass('text-blue-400')}>MANA:</label>
             <input type="number" id="mana" className={statusInputClass('border-blue-500 focus:ring-blue-500')}
-              // REMOVIDO: placeholder="Recurso Mágico"
               value={mana} onChange={(e) => updateCharacterField('mana', e.target.value)} />
           </div>
           <div>
             <label htmlFor="ep" className={statusLabelClass('text-green-400')}>EP:</label>
             <input type="number" id="ep" className={statusInputClass('border-green-500 focus:ring-green-500')}
-              // REMOVIDO: placeholder="Proteção Psíquica"
               value={ep} onChange={(e) => updateCharacterField('ep', e.target.value)} />
           </div>
           <div>
             <label htmlFor="aura" className={statusLabelClass('text-green-400')}>AURA:</label>
             <input type="number" id="aura" className={statusInputClass('border-green-500 focus:ring-green-500')}
-              // REMOVIDO: placeholder="Poder Espiritual"
               value={aura} onChange={(e) => updateCharacterField('aura', e.target.value)} />
           </div>
           <div>
             <label htmlFor="ea" className={statusLabelClass('text-yellow-400')}>EA:</label>
             <input type="number" id="ea" className={statusInputClass('border-yellow-500 focus:ring-yellow-500')}
-              // REMOVIDO: placeholder="Eficiência de Aura"
               value={ea} onChange={(e) => updateCharacterField('ea', e.target.value)} />
           </div>
           <div>
             <label htmlFor="er" className={statusLabelClass('text-orange-400')}>ER:</label>
             <input type="number" id="er" className={statusInputClass('border-orange-500 focus:ring-orange-500')}
-              // REMOVIDO: placeholder="Resistência Elemental"
               value={er} onChange={(e) => updateCharacterField('er', e.target.value)} />
+          </div>
+          {/* ATUALIZADO: Botão Fixar Atributos Base - Menor e Centralizado */}
+          <div className="col-span-full sm:col-span-2 md:col-span-1 flex items-end justify-center"> {/* Adicionado justify-center */}
+            <button
+              onClick={handleFixAttributes}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-md shadow-md transform transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-75" // py-1 px-3 para menor padding
+            >
+              FIXAR ATRIBUTOS BASE
+            </button>
           </div>
         </div>
       </section>
@@ -215,73 +239,61 @@ function CharacterSheet({ characterData, setCharacterData }) {
           <div>
             <label htmlFor="vigor" className="block text-gray-400 text-sm font-bold mb-1">VIGOR:</label>
             <input type="number" id="vigor" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Físico"
               value={vigor} onChange={(e) => updateCharacterField('vigor', e.target.value)} />
           </div>
           <div>
             <label htmlFor="stealth" className="block text-gray-400 text-sm font-bold mb-1">FURTIVIDADE:</label>
             <input type="number" id="stealth" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Movimento Oculto"
               value={stealth} onChange={(e) => updateCharacterField('stealth', e.target.value)} />
           </div>
           <div>
             <label htmlFor="strength" className="block text-gray-400 text-sm font-bold mb-1">FORÇA:</label>
             <input type="number" id="strength" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Poder Bruto"
               value={strength} onChange={(e) => updateCharacterField('strength', e.target.value)} />
           </div>
           <div>
             <label htmlFor="adaptability" className="block text-gray-400 text-sm font-bold mb-1">ADAPTABILIDADE:</label>
             <input type="number" id="adaptability" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Resiliência"
               value={adaptability} onChange={(e) => updateCharacterField('adaptability', e.target.value)} />
           </div>
           <div>
             <label htmlFor="dexterity" className="block text-gray-400 text-sm font-bold mb-1">DESTREZA:</label>
             <input type="number" id="dexterity" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Habilidade Manual"
               value={dexterity} onChange={(e) => updateCharacterField('dexterity', e.target.value)} />
           </div>
           <div>
             <label htmlFor="perception" className="block text-gray-400 text-sm font-bold mb-1">PERCEPÇÃO:</label>
             <input type="number" id="perception" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Atenção aos Detalhes"
               value={perception} onChange={(e) => updateCharacterField('perception', e.target.value)} />
           </div>
           <div>
             <label htmlFor="agility" className="block text-gray-400 text-sm font-bold mb-1">AGILIDADE:</label>
             <input type="number" id="agility" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Velocidade"
               value={agility} onChange={(e) => updateCharacterField('agility', e.target.value)} />
           </div>
           <div>
             <label htmlFor="intuition" className="block text-gray-400 text-sm font-bold mb-1">INTUIÇÃO:</label>
             <input type="number" id="intuition" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Sexto Sentido"
               value={intuition} onChange={(e) => updateCharacterField('intuition', e.target.value)} />
           </div>
           <div>
             <label htmlFor="rarity" className="block text-gray-400 text-sm font-bold mb-1">RARIDADE:</label>
             <input type="number" id="rarity" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Quão raro?"
               value={rarity} onChange={(e) => updateCharacterField('rarity', e.target.value)} />
           </div>
           <div>
             <label htmlFor="athletics" className="block text-gray-400 text-sm font-bold mb-1">ATLETISMO:</label>
             <input type="number" id="athletics" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Força Física"
               value={athletics} onChange={(e) => updateCharacterField('athletics', e.target.value)} />
           </div>
           <div>
             <label htmlFor="animalHandling" className="block text-gray-400 text-sm font-bold mb-1">LIDAR COM ANIMAIS:</label>
             <input type="number" id="animalHandling" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Charme Animal"
               value={animalHandling} onChange={(e) => updateCharacterField('animalHandling', e.target.value)} />
           </div>
           <div>
             <label htmlFor="initiative" className="block text-gray-400 text-sm font-bold mb-1">INICIATIVA:</label>
             <input type="number" id="initiative" className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-white placeholder-gray-500"
-              // REMOVIDO: placeholder="Velocidade de Reação"
               value={initiative} onChange={(e) => updateCharacterField('initiative', e.target.value)} />
           </div>
         </div>
