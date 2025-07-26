@@ -2,8 +2,10 @@ import React, { useState, useRef, useCallback } from 'react';
 import RollAnimationOverlay from './RollAnimationOverlay';
 
 // Sons
-const diceRollSound = new Audio('/sounds/dice_roll.mp3');
-const diceLandSound = new Audio('/sounds/dice_land.mp3'); // Certifique-se de ter este arquivo!
+// Caminhos explícitos para o GitHub Pages para garantir que os sons sejam encontrados.
+// Substitua 'rpg-app' pelo nome exato do seu repositório se for diferente.
+const diceRollSound = new Audio('/rpg-app/sounds/dice_roll.mp3');
+const diceLandSound = new Audio('/rpg-app/sounds/dice_land.mp3');
 
 function DiceRoller({ onRollStart, onRollEnd }) {
   const [expression, setExpression] = useState('');
@@ -20,6 +22,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     if (isNaN(numValue)) {
       return 'text-white';
     }
+    // Mantém a lógica de cor existente, se houver uma diferença para valores < 10
     return numValue < 10 ? 'text-white' : 'text-white';
   };
 
@@ -40,50 +43,68 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     // Tocar som de rolar dados
     diceRollSound.pause();
     diceRollSound.currentTime = 0;
-    diceRollSound.play().catch(e => console.error("Erro ao tocar som:", e));
+    diceRollSound.play().catch(e => console.error("Erro ao tocar som de rolagem:", e));
 
     setResult(null);
     setShowResultGlow(false);
 
     let calculatedResult = 0;
     let calculatedHistoryEntry = exprToRoll;
+    let errorOccurred = false;
 
     try {
+      // Regex para encontrar padrões de dados (ex: 1d6, 2d20, d10)
       const diceRegex = /(\d*)d(\d+)/g;
-      let diceRolls = [];
+      let diceRollsDetails = []; // Para armazenar os detalhes de cada rolagem de dado
 
+      // Substitui as expressões de dados pelas somas dos resultados
       const processedExpression = exprToRoll.replace(diceRegex, (match, numDiceStr, numSidesStr) => {
         const numDice = numDiceStr ? parseInt(numDiceStr, 10) : 1;
         const numSides = parseInt(numSidesStr, 10);
+
+        if (isNaN(numDice) || isNaN(numSides) || numSides <= 0) {
+          errorOccurred = true;
+          throw new Error('Expressão de dado inválida: ' + match);
+        }
+
         let rollSum = 0;
         let rolls = [];
-
         for (let i = 0; i < numDice; i++) {
-          // Isso aqui era pra gerar numero aleatorio 
           const roll = Math.floor(Math.random() * numSides) + 1;
           rolls.push(roll);
           rollSum += roll;
         }
-        diceRolls.push(`${numDice || 1}d${numSides} [${rolls.join(', ')}] = ${rollSum}`);
-        return rollSum;
+        diceRollsDetails.push(`${numDice || 1}d${numSides} [${rolls.join(', ')}]`);
+        return rollSum; // Retorna a soma para ser usada na expressão final
       });
 
-      // Avalia a expressão com as somas substituídas
-      // eslint-disable-next-line no-eval
-      calculatedResult = eval(processedExpression);
+      // Validação básica para garantir que a expressão processada só tem números e operadores
+      const safeProcessedExpression = processedExpression.replace(/\s/g, ''); // Remove espaços
+      if (!/^[0-9+\-*/().]+$/.test(safeProcessedExpression)) {
+        errorOccurred = true;
+        throw new Error('Expressão contém caracteres inválidos após rolagem de dados.');
+      }
 
-      if (diceRolls.length > 0) {
-        calculatedHistoryEntry += ` => ${diceRolls.join(' + ')}`;
+      // Usando Function constructor como alternativa mais segura ao eval para expressões matemáticas simples
+      calculatedResult = new Function('return ' + safeProcessedExpression)();
+
+      // Formata a entrada do histórico
+      calculatedHistoryEntry = exprToRoll;
+      if (diceRollsDetails.length > 0) {
+        calculatedHistoryEntry += ` (${diceRollsDetails.join(' + ')})`;
       }
       calculatedHistoryEntry += ` = ${calculatedResult}`;
+
     } catch (error) {
+      console.error("Erro ao processar expressão de rolagem:", error);
       calculatedResult = 'Erro na expressão!';
       calculatedHistoryEntry = `Erro ao rolar '${exprToRoll}'`;
+      errorOccurred = true;
     }
 
     setShowAnimationOverlay(true);
 
-    const overlayAnimationDuration = 2050;
+    const overlayAnimationDuration = 2050; // Duração da animação do overlay
 
     setTimeout(() => {
       setShowAnimationOverlay(false);
@@ -92,8 +113,14 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       setDiceHistory(prevHistory => [calculatedHistoryEntry, ...prevHistory].slice(0, 5));
       onRollEnd();
       rollingRef.current = false; // Permite nova rolagem
+
+      // Tocar som de dado caindo (land)
+      diceLandSound.pause();
+      diceLandSound.currentTime = 0;
+      diceLandSound.play().catch(e => console.error("Erro ao tocar som de aterrissagem:", e));
+
     }, overlayAnimationDuration);
-  }, [expression, onRollStart, onRollEnd]);
+  }, [expression, onRollStart, onRollEnd]); // Dependências do useCallback
 
   return (
     <div className="p-6 bg-gray-700/50 rounded-lg shadow-xl border border-gray-600 backdrop-blur-sm">
