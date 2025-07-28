@@ -489,7 +489,7 @@ export function AppProvider({ children }) {
     },
 
     setTheme: (theme) => {
-      const validThemes = ['dark', 'light', 'auto'];
+      const validThemes = ['dark', 'cyberpunk', 'medieval', 'nature', 'fire', 'ice'];
       if (!validThemes.includes(theme)) {
         console.error('Tema inválido:', theme);
         return;

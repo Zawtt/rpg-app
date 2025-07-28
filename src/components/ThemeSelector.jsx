@@ -4,15 +4,24 @@ import { themes, useTheme } from './ThemeProvider';
 import { useAppContext } from '../contexts/AppContext';
 import '../index.css'; // Ensure we have access to global styles
 
+// Importar ActionTypes do contexto
+const ActionTypes = {
+  SET_THEME: 'SET_THEME'
+};
+
 const ThemeSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { ui, dispatch } = useAppContext();
+  const { ui, setTheme } = useAppContext();
   const currentTheme = ui.theme || 'dark';
   const theme = useTheme();
 
   const handleThemeChange = (themeName) => {
-    dispatch({ type: 'SET_THEME', payload: themeName });
-    console.log(`Tema alterado para ${themes[themeName].name}`);
+    console.log(`🎨 Tentando alterar tema para: ${themeName}`);
+    console.log(`🎨 Tema atual: ${currentTheme}`);
+    
+    setTheme(themeName);
+    
+    console.log(`🎨 setTheme chamado para tema: ${themes[themeName].name}`);
     setIsOpen(false);
   };
 

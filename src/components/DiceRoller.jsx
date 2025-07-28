@@ -502,9 +502,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             <div className={`text-sm ${theme.classes.textSecondary} mt-3 relative z-10 font-medium`}>
               {result === 1 && '💀 Falha Crítica!'}
               {result === 20 && '🎉 Sucesso Crítico!'}
-              {result >= 15 && result < 20 && '✨ Excelente!'}
-              {result >= 10 && result < 15 && '👍 Bom resultado'}
-              {result < 10 && result > 1 && '😐 Resultado médio'}
+              {result >= 15 && result < 20 && ' Excelente!'}
+              {result >= 10 && result < 15 && ' Bom resultado'}
+              {result < 10 && result > 1 && ' Resultado médio'}
             </div>
           )}
         </div>

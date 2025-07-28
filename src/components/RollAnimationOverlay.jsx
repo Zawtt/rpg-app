@@ -13,7 +13,7 @@ const createAudioSafely = (src) => {
   }
 };
 
-const diceLandSound = createAudioSafely('/sounds/dice_land.mp3');
+const diceLandSound = createAudioSafely('/rpg-app/sounds/dice_land.mp3');
 
 function RollAnimationOverlay({ onAnimationEnd }) { // Remove targetRect, targetFontSize, result pois não são mais usados para animação de movimento
   const theme = useTheme();

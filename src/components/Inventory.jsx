@@ -387,7 +387,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                 {/* Descrição */}
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-emerald-500">
                   <h3 className="text-lg font-medium text-gray-100 mb-4 uppercase tracking-wider">
-                    📦 Descrição
+                     Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">
                     <p className="text-gray-300 leading-relaxed text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
