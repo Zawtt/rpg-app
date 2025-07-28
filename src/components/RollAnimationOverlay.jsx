@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const diceLandSound = new Audio('/sounds/dice_land.mp3'); // Certifique-se de ter este arquivo!
+// ✅ CORREÇÃO: Audio com verificação de disponibilidade
+const createAudioSafely = (src) => {
+  try {
+    const audio = new Audio(src);
+    audio.preload = 'none'; // Não carregar automaticamente
+    return audio;
+  } catch (error) {
+    console.warn('Áudio não disponível:', error);
+    return null;
+  }
+};
+
+const diceLandSound = createAudioSafely('/sounds/dice_land.mp3');
 
 function RollAnimationOverlay({ onAnimationEnd }) { // Remove targetRect, targetFontSize, result pois não são mais usados para animação de movimento
   const [animationPhase, setAnimationPhase] = useState('entering'); // 'entering', 'rolling', 'exiting'
@@ -37,7 +49,10 @@ function RollAnimationOverlay({ onAnimationEnd }) { // Remove targetRect, target
           intervalRef.current = null;
           // Após a rolagem rápida, transiciona para a fase 'exiting'
           setAnimationPhase('exiting');
-          diceLandSound.play().catch(e => console.error("Erro ao tocar som de pouso:", e)); // Toca o som ao final da rolagem
+          // ✅ CORREÇÃO: Tocar áudio com verificação de disponibilidade
+          if (diceLandSound) {
+            diceLandSound.play().catch(e => console.warn("Erro ao tocar som de pouso:", e));
+          }
         }
       }, rollSpeed);
 

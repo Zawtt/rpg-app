@@ -10,6 +10,85 @@ const playSound = (soundName) => {
   console.log(`🔊 Playing sound: ${soundName}`);
 };
 
+// ✅ CORREÇÃO: Parser seguro para expressões matemáticas
+const safeEvaluateExpression = (expression) => {
+  try {
+    // Remover espaços e validar caracteres permitidos
+    const cleanExpr = expression.replace(/\s/g, '');
+    
+    // Verificar se contém apenas números e operadores matemáticos básicos
+    if (!/^[0-9+\-*/().]+$/.test(cleanExpr)) {
+      throw new Error('Expressão contém caracteres não permitidos');
+    }
+    
+    // Parser simples e seguro para expressões matemáticas
+    const tokens = cleanExpr.match(/(\d+\.?\d*|[+\-*/()])/g);
+    if (!tokens) throw new Error('Expressão inválida');
+    
+    // Avaliar usando uma pilha (stack-based evaluation)
+    return evaluateTokens(tokens);
+  } catch (error) {
+    throw new Error(`Erro ao avaliar expressão: ${error.message}`);
+  }
+};
+
+// Avaliador de tokens seguro
+const evaluateTokens = (tokens) => {
+  const outputQueue = [];
+  const operatorStack = [];
+  const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
+  
+  // Converter para notação polonesa reversa (RPN)
+  for (let token of tokens) {
+    if (/^\d+\.?\d*$/.test(token)) {
+      outputQueue.push(parseFloat(token));
+    } else if (token === '(') {
+      operatorStack.push(token);
+    } else if (token === ')') {
+      while (operatorStack.length && operatorStack[operatorStack.length - 1] !== '(') {
+        outputQueue.push(operatorStack.pop());
+      }
+      operatorStack.pop(); // Remove '('
+    } else if (['+', '-', '*', '/'].includes(token)) {
+      while (
+        operatorStack.length &&
+        operatorStack[operatorStack.length - 1] !== '(' &&
+        precedence[operatorStack[operatorStack.length - 1]] >= precedence[token]
+      ) {
+        outputQueue.push(operatorStack.pop());
+      }
+      operatorStack.push(token);
+    }
+  }
+  
+  while (operatorStack.length) {
+    outputQueue.push(operatorStack.pop());
+  }
+  
+  // Avaliar RPN
+  const stack = [];
+  for (let token of outputQueue) {
+    if (typeof token === 'number') {
+      stack.push(token);
+    } else {
+      const b = stack.pop();
+      const a = stack.pop();
+      switch (token) {
+        case '+': stack.push(a + b); break;
+        case '-': stack.push(a - b); break;
+        case '*': stack.push(a * b); break;
+        case '/':
+          if (b === 0) throw new Error('Divisão por zero');
+          stack.push(a / b);
+          break;
+        default: throw new Error(`Operador desconhecido: ${token}`);
+      }
+    }
+  }
+  
+  return Math.round(stack[0] * 100) / 100; // Arredondar para 2 casas decimais
+};
+
 function DiceRoller({ onRollStart, onRollEnd }) {
   const [expression, setExpression] = useState('');
   const [result, setResult] = useState(null);
@@ -38,8 +117,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     }
   }, [debouncedExpression, validateDiceExpression]);
 
-  // Quick roll buttons memoizados
-  const quickRolls = useMemo(() => [
+  // ✅ CORREÇÃO: Array estático não precisa de useMemo
+  const quickRolls = [
     { label: 'd4', value: '1d4', description: 'Dado de 4 faces' },
     { label: 'd6', value: '1d6', description: 'Dado de 6 faces' },
     { label: 'd8', value: '1d8', description: 'Dado de 8 faces' },
@@ -48,7 +127,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     { label: 'd20', value: '1d20', description: 'Dado de 20 faces' },
     { label: '2d6', value: '2d6', description: '2 dados de 6 faces' },
     { label: '3d6', value: '3d6', description: '3 dados de 6 faces' }
-  ], []);
+  ];
 
   // Função para determinar cor do resultado
   const getResultColorClass = useCallback((value) => {
@@ -125,8 +204,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         throw new Error('Expressão contém caracteres inválidos após processamento dos dados.');
       }
 
-      // Calcular resultado final
-      calculatedResult = new Function('return ' + safeProcessedExpression)();
+      // Calcular resultado final usando parser seguro
+      calculatedResult = safeEvaluateExpression(safeProcessedExpression);
 
       // Preparar entrada do histórico
       calculatedHistoryEntry = exprToRoll;

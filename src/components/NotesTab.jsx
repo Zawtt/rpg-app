@@ -5,15 +5,33 @@ function NotesTab() {
   const localStorageKey = 'rpgCharacterNotes'; // Chave para o localStorage
 
   useEffect(() => {
-    const savedNotes = localStorage.getItem(localStorageKey);
-    if (savedNotes) {
-      setNotes(savedNotes);
+    // ✅ CORREÇÃO: localStorage com verificação de disponibilidade
+    try {
+      if (typeof Storage !== 'undefined') {
+        const savedNotes = localStorage.getItem(localStorageKey);
+        if (savedNotes) {
+          setNotes(savedNotes);
+        }
+      }
+    } catch (error) {
+      console.warn('localStorage não disponível:', error);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(localStorageKey, notes);
-  }, [notes]); // Salva sempre que as notas mudam
+    // ✅ CORREÇÃO: localStorage com tratamento de erro e debounce
+    const timeoutId = setTimeout(() => {
+      try {
+        if (typeof Storage !== 'undefined') {
+          localStorage.setItem(localStorageKey, notes);
+        }
+      } catch (error) {
+        console.warn('Erro ao salvar notas no localStorage:', error);
+      }
+    }, 500); // Debounce de 500ms para evitar muitas escritas
+
+    return () => clearTimeout(timeoutId);
+  }, [notes]);
 
   return (
     <div className="p-4 bg-gray-800/60 rounded-md border border-gray-700">

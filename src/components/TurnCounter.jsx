@@ -5,14 +5,31 @@ function TurnCounter() {
   const localStorageKey = 'rpgTurnCounter';
 
   useEffect(() => {
-    const savedTurn = localStorage.getItem(localStorageKey);
-    if (savedTurn) {
-      setTurn(parseInt(savedTurn));
+    // ✅ CORREÇÃO: localStorage com verificação de disponibilidade
+    try {
+      if (typeof Storage !== 'undefined') {
+        const savedTurn = localStorage.getItem(localStorageKey);
+        if (savedTurn) {
+          const parsedTurn = parseInt(savedTurn, 10);
+          if (!isNaN(parsedTurn) && parsedTurn > 0) {
+            setTurn(parsedTurn);
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('localStorage não disponível:', error);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(localStorageKey, turn.toString());
+    // ✅ CORREÇÃO: localStorage com tratamento de erro
+    try {
+      if (typeof Storage !== 'undefined') {
+        localStorage.setItem(localStorageKey, turn.toString());
+      }
+    } catch (error) {
+      console.warn('Erro ao salvar no localStorage:', error);
+    }
   }, [turn]);
 
   const incrementTurn = () => {

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Save, Download, Gamepad2, Settings } from 'lucide-react';
+import React, { useCallback, useMemo } from 'react';
+import { Download, Gamepad2 } from 'lucide-react';
 
 // Context e Providers
 import { AppProvider, useAppContext } from './contexts/AppContext';
@@ -15,10 +15,9 @@ import Inventory from './components/Inventory';
 import Debuffs from './components/Debuffs';
 import { ToastContainer } from './components/Toast';
 import ThemeSelector from './components/ThemeSelector';
-import { LoadingButton } from './components/LoadingSpinner';
 
 // Hooks customizados
-import { useSaveSystem, useAnimations, useKeyboardShortcuts } from './hooks';
+import { useAnimations, useKeyboardShortcuts } from './hooks';
 
 // Componentes memoizados para otimização
 const MemoizedCharacterSheet = React.memo(CharacterSheet);
@@ -46,9 +45,10 @@ function AppContent() {
     showToast
   } = useAppContext();
 
-  // Hooks customizados
-  const { saveAllData, loadAllData, exportData } = useSaveSystem();
+  // Hook para exportar dados
+  const { exportData } = useAppContext();
   const { triggerShake, triggerDiceRoll } = useAnimations();
+  
   
   // Ativar atalhos de teclado
   useKeyboardShortcuts();
@@ -88,51 +88,10 @@ function AppContent() {
     // Callback vazio - a animação é controlada pelo triggerDiceRoll
   }, []);
 
-  // Handlers para save/load com validação
-  const handleSaveAll = useCallback(async () => {
-    try {
-      const dataToSave = {
-        characterData,
-        abilities,
-        inventoryItems,
-        fixedAttributes,
-        debuffs,
-        timestamp: new Date().toISOString(),
-        version: '1.0'
-      };
-
-      await saveAllData(dataToSave);
-    } catch (error) {
-      console.error('Erro ao salvar:', error);
-      showToast('Erro inesperado ao salvar', 'error');
-    }
-  }, [characterData, abilities, inventoryItems, fixedAttributes, debuffs, saveAllData, showToast]);
-
-  const handleLoadAll = useCallback(async () => {
-    try {
-      const result = await loadAllData();
-      if (result.success && result.data) {
-        // Aqui você atualizaria o estado com os dados carregados
-        showToast('Dados carregados com sucesso!', 'success');
-      }
-    } catch (error) {
-      console.error('Erro ao carregar:', error);
-      showToast('Erro inesperado ao carregar', 'error');
-    }
-  }, [loadAllData, showToast]);
-
+  // Handler para exportar dados
   const handleExportData = useCallback(() => {
-    const dataToExport = {
-      characterData,
-      abilities,
-      inventoryItems,
-      fixedAttributes,
-      debuffs,
-      exportDate: new Date().toISOString(),
-      version: '1.0'
-    };
-    exportData(dataToExport);
-  }, [characterData, abilities, inventoryItems, fixedAttributes, debuffs, exportData]);
+    exportData();
+  }, [exportData]);
 
   // Memoizar componentes pesados com dependências específicas
   const memoizedCharacterSheet = useMemo(() => (
@@ -144,11 +103,8 @@ function AppContent() {
   ), [characterData, updateCharacterData, handleFixAttributesFromSheet]);
 
   const memoizedAbilities = useMemo(() => (
-    <MemoizedAbilitiesAndSpells 
-      abilities={abilities} 
-      setAbilities={setAbilities} 
-    />
-  ), [abilities, setAbilities]);
+    <MemoizedAbilitiesAndSpells />
+  ), []);
 
   const memoizedInventory = useMemo(() => (
     <MemoizedInventory 
@@ -158,11 +114,8 @@ function AppContent() {
   ), [inventoryItems, setInventoryItems]);
 
   const memoizedDebuffs = useMemo(() => (
-    <MemoizedDebuffs 
-      debuffs={debuffs} 
-      setDebuffs={setDebuffs} 
-    />
-  ), [debuffs, setDebuffs]);
+    <MemoizedDebuffs />
+  ), []);
 
   const memoizedDiceRoller = useMemo(() => (
     <MemoizedDiceRoller 
@@ -206,6 +159,7 @@ function AppContent() {
               {/* Seletor de Tema */}
               <ThemeSelector />
               
+              
               {/* Botão Exportar */}
               <button
                 onClick={handleExportData}
@@ -216,29 +170,12 @@ function AppContent() {
                 <span className="hidden sm:inline">Export</span>
               </button>
               
-              {/* Botão Salvar com Loading */}
-              <LoadingButton
-                onClick={handleSaveAll}
-                loading={ui.loading.saving}
-                loadingText="Salvando..."
-                loadingType="saving"
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              >
-                <Save size={16} />
-                Save All
-              </LoadingButton>
-              
-              {/* Botão Carregar com Loading */}
-              <LoadingButton
-                onClick={handleLoadAll}
-                loading={ui.loading.loading}
-                loadingText="Carregando..."
-                loadingType="loading"
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-              >
-                <Download size={16} />
-                Load All
-              </LoadingButton>
+              {/* Indicador de Auto-Save */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-green-600/20 border border-green-600/30 text-green-400 rounded-lg text-sm">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="hidden sm:inline">Auto-Save Ativo</span>
+                <span className="sm:hidden">Auto</span>
+              </div>
             </div>
           </div>
         </div>
@@ -332,11 +269,12 @@ function AppContent() {
       {/* Container de Toasts */}
       <ToastContainer />
 
+
       {/* Acessibilidade - Screen Reader */}
-      <div 
-        id="sr-announcements" 
-        className="sr-only" 
-        aria-live="polite" 
+      <div
+        id="sr-announcements"
+        className="sr-only"
+        aria-live="polite"
         aria-atomic="true"
       />
 

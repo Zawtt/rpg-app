@@ -1,24 +1,10 @@
 import React, { useState } from 'react';
 import { Skull, Plus, Trash2, Clock, X } from 'lucide-react';
+import { useAppContext } from '../contexts/AppContext';
 
-function Debuffs({ debuffs: propDebuffs = [], setDebuffs: propSetDebuffs = () => {} }) {
-  // Estados mockados para funcionamento
-  const [debuffs, setDebuffs] = useState([
-    {
-      id: 1,
-      name: "Veneno",
-      turns: 2, 
-      maxTurns: 3,
-      color: { bg: 'bg-green-600', border: 'border-green-500', text: 'text-green-400' }
-    },
-    {
-      id: 2,
-      name: "Queimadura",
-      turns: 1,
-      maxTurns: 2, 
-      color: { bg: 'bg-red-600', border: 'border-red-500', text: 'text-red-400' }
-    }
-  ]);
+function Debuffs() {
+  // ✅ CORREÇÃO: Usar context ao invés de dados mockados
+  const { debuffs, setDebuffs, showToast } = useAppContext();
   
   const [newDebuff, setNewDebuff] = useState({ name: '', turns: 1 });
 
@@ -49,21 +35,32 @@ function Debuffs({ debuffs: propDebuffs = [], setDebuffs: propSetDebuffs = () =>
       };
       setDebuffs([...debuffs, debuffWithColor]);
       setNewDebuff({ name: '', turns: 1 });
+      showToast(`Debuff "${debuffWithColor.name}" adicionado!`, 'warning');
     }
   };
 
   const removeDebuff = (idToRemove) => {
+    const debuffToRemove = debuffs.find(d => d.id === idToRemove);
     setDebuffs(debuffs.filter(debuff => debuff.id !== idToRemove));
+    if (debuffToRemove) {
+      showToast(`Debuff "${debuffToRemove.name}" removido`, 'success');
+    }
   };
 
   const decreaseTurn = (id) => {
-    setDebuffs(debuffs.map(debuff => {
+    const updatedDebuffs = debuffs.map(debuff => {
       if (debuff.id === id) {
         const newTurns = debuff.turns - 1;
-        return newTurns <= 0 ? null : { ...debuff, turns: newTurns };
+        if (newTurns <= 0) {
+          showToast(`Debuff "${debuff.name}" expirou!`, 'success');
+          return null;
+        }
+        return { ...debuff, turns: newTurns };
       }
       return debuff;
-    }).filter(Boolean));
+    }).filter(Boolean);
+    
+    setDebuffs(updatedDebuffs);
   };
 
   return (

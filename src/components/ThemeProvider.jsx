@@ -1,8 +1,8 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext';
 
-// Definição dos temas
-export const themes = {
+// ✅ CORREÇÃO: Definição dos temas movida para dentro do arquivo (não exportada)
+const themes = {
   dark: {
     name: 'Dark Knight',
     description: 'Tema escuro clássico',
@@ -151,14 +151,14 @@ export const themes = {
   }
 };
 
-// Hook para usar tema atual
-export const useTheme = () => {
+// ✅ CORREÇÃO: Hook useTheme movido para dentro do arquivo
+const useTheme = () => {
   const { ui } = useAppContext();
   return themes[ui.theme] || themes.dark;
 };
 
-// ✅ Componente ThemeProvider corrigido com z-index adequado
-const ThemeProvider = ({ children }) => {
+// ✅ CORREÇÃO: Componente ThemeProvider como export default único
+function ThemeProvider({ children }) {
   const theme = useTheme();
   
   // Aplicar classes CSS customizadas baseadas no tema
@@ -249,6 +249,14 @@ const ThemeProvider = ({ children }) => {
       </div>
     </>
   );
-};
+}
 
+// ✅ CORREÇÃO: Exportações separadas para evitar problema com Fast Refresh
+// Export do objeto themes para componentes que precisam da lista de temas
+export { themes };
+
+// Export do hook useTheme para componentes que precisam do tema atual
+export { useTheme };
+
+// ✅ CORREÇÃO: Export default apenas do componente principal
 export default ThemeProvider;

@@ -44,16 +44,27 @@ const ValidatedInput = React.memo(({
   const handleChange = useCallback((e) => {
     const newValue = e.target.value;
     
-    // Validação em tempo real para casos críticos
+    // ✅ CORREÇÃO: Validação melhorada com feedback
     if (type === 'number' && newValue !== '') {
       const numValue = Number(newValue);
-      if (isNaN(numValue) || (min !== undefined && numValue < min) || (max !== undefined && numValue > max)) {
-        return; // Não permitir entrada inválida
+      if (isNaN(numValue)) {
+        setError('Deve ser um número válido');
+        return;
       }
+      if (min !== undefined && numValue < min) {
+        setError(`Valor mínimo: ${min}`);
+        return;
+      }
+      if (max !== undefined && numValue > max) {
+        setError(`Valor máximo: ${max}`);
+        return;
+      }
+      // Limpar erro se validação passou
+      if (error) setError('');
     }
     
     onChange(e);
-  }, [onChange, type, min, max]);
+  }, [onChange, type, min, max, error]);
 
   return (
     <div className="relative">

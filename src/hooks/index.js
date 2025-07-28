@@ -127,26 +127,71 @@ export const useValidation = () => {
   };
 };
 
-// Hook para sistema de save/load simulado
+// Hook para sistema de save/load robusto
 export const useSaveSystem = () => {
   const { showToast, setLoading } = useAppContext();
+  const saveSystemRef = useRef(null);
+
+  // Inicializar sistema robusto
+  useEffect(() => {
+    const initializeSaveSystem = async () => {
+      try {
+        const { getSaveSystem } = await import('../utils/robustSaveSystem.js');
+        saveSystemRef.current = getSaveSystem();
+        
+        // Configurar listeners de eventos
+        saveSystemRef.current.on('save-success', ({ duration }) => {
+          showToast(`Dados salvos com sucesso! (${duration.toFixed(0)}ms)`, 'success');
+        });
+
+        saveSystemRef.current.on('save-error', (error) => {
+          showToast(`Erro ao salvar: ${error.message}`, 'error');
+        });
+
+        saveSystemRef.current.on('load-success', ({ duration }) => {
+          showToast(`Dados carregados com sucesso! (${duration.toFixed(0)}ms)`, 'success');
+        });
+
+        saveSystemRef.current.on('load-error', (error) => {
+          showToast(`Erro ao carregar: ${error.message}`, 'error');
+        });
+
+        saveSystemRef.current.on('validation-warnings', (warnings) => {
+          console.warn('⚠️ Avisos de validação:', warnings);
+          showToast(`${warnings.length} aviso(s) de validação`, 'warning');
+        });
+
+        // Inicializar sistema
+        await saveSystemRef.current.initialize();
+        
+      } catch (error) {
+        console.error('Erro ao inicializar sistema de salvamento:', error);
+        showToast('Erro ao inicializar sistema de salvamento', 'error');
+      }
+    };
+
+    initializeSaveSystem();
+
+    return () => {
+      if (saveSystemRef.current) {
+        saveSystemRef.current.destroy();
+      }
+    };
+  }, [showToast]);
 
   const saveAllData = useCallback(async (data) => {
+    if (!saveSystemRef.current) {
+      showToast('Sistema de salvamento não inicializado', 'error');
+      return { success: false, error: 'Sistema não inicializado' };
+    }
+
     setLoading({ saving: true });
     
     try {
-      // Simular delay de salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Aqui você salvaria os dados em localStorage, API, etc.
-      // Como não podemos usar localStorage, apenas simulamos
-      console.log('Dados que seriam salvos:', data);
-      
-      showToast('Dados salvos com sucesso!', 'success');
-      return { success: true };
+      const result = await saveSystemRef.current.saveData(data);
+      return result;
     } catch (error) {
       console.error('Erro ao salvar:', error);
-      showToast('Erro ao salvar dados', 'error');
       return { success: false, error };
     } finally {
       setLoading({ saving: false });
@@ -154,64 +199,117 @@ export const useSaveSystem = () => {
   }, [showToast, setLoading]);
 
   const loadAllData = useCallback(async () => {
+    if (!saveSystemRef.current) {
+      showToast('Sistema de salvamento não inicializado', 'error');
+      return { success: false, error: 'Sistema não inicializado' };
+    }
+
     setLoading({ loading: true });
     
     try {
-      // Simular delay de carregamento
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Aqui você carregaria os dados
-      // Retornando dados simulados como exemplo
-      const simulatedData = {
-        characterData: {
-          name: 'Personagem Exemplo',
-          race: 'Humano',
-          hp: '100',
-          mana: '50'
-          // ... outros dados
-        },
-        abilities: [],
-        inventoryItems: [],
-        fixedAttributes: [],
-        debuffs: []
-      };
-      
-      showToast('Dados carregados com sucesso!', 'success');
-      return { success: true, data: simulatedData };
+      const result = await saveSystemRef.current.loadData();
+      return result;
     } catch (error) {
       console.error('Erro ao carregar:', error);
-      showToast('Erro ao carregar dados', 'error');
       return { success: false, error };
     } finally {
       setLoading({ loading: false });
     }
   }, [showToast, setLoading]);
 
-  const exportData = useCallback((data) => {
+  const exportData = useCallback((data, filename) => {
+    if (!saveSystemRef.current) {
+      showToast('Sistema de salvamento não inicializado', 'error');
+      return false;
+    }
+
     try {
-      const jsonString = JSON.stringify(data, null, 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `rpg-character-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      URL.revokeObjectURL(url);
-      showToast('Dados exportados com sucesso!', 'success');
+      return saveSystemRef.current.exportData(data, filename);
     } catch (error) {
       console.error('Erro ao exportar:', error);
       showToast('Erro ao exportar dados', 'error');
+      return false;
+    }
+  }, [showToast]);
+
+  const importData = useCallback(async (file) => {
+    if (!saveSystemRef.current) {
+      showToast('Sistema de salvamento não inicializado', 'error');
+      return { success: false, error: 'Sistema não inicializado' };
+    }
+
+    try {
+      const result = await saveSystemRef.current.importData(file);
+      return result;
+    } catch (error) {
+      console.error('Erro ao importar:', error);
+      showToast(`Erro ao importar: ${error.message}`, 'error');
+      return { success: false, error };
+    }
+  }, [showToast]);
+
+  const runDiagnostic = useCallback(async (data) => {
+    if (!saveSystemRef.current) {
+      return null;
+    }
+
+    try {
+      return await saveSystemRef.current.runDiagnostic(data);
+    } catch (error) {
+      console.error('Erro no diagnóstico:', error);
+      return null;
+    }
+  }, []);
+
+  const getBackupList = useCallback(() => {
+    if (!saveSystemRef.current) {
+      return [];
+    }
+    return saveSystemRef.current.getBackupList();
+  }, []);
+
+  const restoreBackup = useCallback(async (backupId) => {
+    if (!saveSystemRef.current) {
+      showToast('Sistema de salvamento não inicializado', 'error');
+      return { success: false };
+    }
+
+    try {
+      const result = await saveSystemRef.current.restoreBackup(backupId);
+      showToast('Backup restaurado com sucesso!', 'success');
+      return result;
+    } catch (error) {
+      console.error('Erro ao restaurar backup:', error);
+      showToast(`Erro ao restaurar backup: ${error.message}`, 'error');
+      return { success: false, error };
+    }
+  }, [showToast]);
+
+  const enableAutoSave = useCallback((getData) => {
+    if (saveSystemRef.current) {
+      saveSystemRef.current.enableAutoSave(getData);
+      showToast('Auto-save habilitado', 'success');
+    }
+  }, [showToast]);
+
+  const disableAutoSave = useCallback(() => {
+    if (saveSystemRef.current) {
+      saveSystemRef.current.disableAutoSave();
+      showToast('Auto-save desabilitado', 'info');
     }
   }, [showToast]);
 
   return {
     saveAllData,
     loadAllData,
-    exportData
+    exportData,
+    importData,
+    runDiagnostic,
+    getBackupList,
+    restoreBackup,
+    enableAutoSave,
+    disableAutoSave,
+    isInitialized: () => saveSystemRef.current !== null
   };
 };
 

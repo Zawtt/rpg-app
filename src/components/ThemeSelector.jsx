@@ -40,6 +40,20 @@ const ThemeSelector = () => {
     setIsOpen(false);
   };
 
+  // Adicionar suporte para tecla Escape
+  React.useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen]);
+
   const themePreviewColors = {
     dark: 'from-gray-800 to-blue-600',
     cyberpunk: 'from-cyan-600 to-purple-600',
@@ -67,13 +81,13 @@ const ThemeSelector = () => {
       {isOpen && (
         <>
           {/* Overlay */}
-          <div 
+          <div
             className="theme-overlay"
             onClick={() => setIsOpen(false)}
           />
           
           {/* Modal de Seleção */}
-          <div className="theme-dropdown">
+          <div className="theme-dropdown" onClick={(e) => e.stopPropagation()}>
             
             {/* Header */}
             <div className="p-4 border-b border-gray-700">
@@ -183,7 +197,7 @@ const ThemeSelector = () => {
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(4px);
-          z-index: 998;
+          z-index: 52;
         }
 
         .theme-dropdown {
@@ -199,19 +213,19 @@ const ThemeSelector = () => {
           border: 1px solid rgb(55, 65, 81);
           border-radius: 12px;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          z-index: 999;
+          z-index: 53;
           animation: theme-dropdown-in 0.2s ease-out;
           transform-origin: top right;
         }
 
         .theme-close-btn {
           position: relative;
-          z-index: 1000;
+          z-index: 54;
         }
 
         .theme-option {
           position: relative;
-          z-index: 999;
+          z-index: 54;
         }
 
         @keyframes theme-dropdown-in {
@@ -249,6 +263,16 @@ const ThemeSelector = () => {
         /* Prevent backdrop blur conflicts */
         .theme-dropdown * {
           backdrop-filter: none;
+        }
+
+        /* Garantir que o dropdown fique sempre visível */
+        .theme-selector-wrapper .theme-dropdown {
+          z-index: 53 !important;
+        }
+
+        /* Adicionar suporte para tecla Escape */
+        .theme-dropdown:focus {
+          outline: none;
         }
       `}</style>
     </div>
