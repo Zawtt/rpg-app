@@ -368,7 +368,7 @@ function CharacterSheet({ onFixAttributes }) {
         fieldName="aura"
         min={0}
         max={9999}
-        className="border-gray-400 focus:ring-gray-400"
+        className="border-white focus:ring-gray-400"
       />
       
       {/* Segunda linha: MANA e EN */}
@@ -381,7 +381,7 @@ function CharacterSheet({ onFixAttributes }) {
         fieldName="mana"
         min={0}
         max={9999}
-        className="border-blue-500 focus:ring-blue-500"
+        className="border-blue-600 focus:ring-blue-600"
       />
       <ValidatedInput
         id="en"
@@ -423,7 +423,7 @@ function CharacterSheet({ onFixAttributes }) {
         onChange={(e) => updateCharacterField('er', e.target.value)}
         min={0}
         max={9999}
-        className="border-cyan-300 focus:ring-cyan-300"
+        className="border-sky-500 focus:ring-sky-500"
       />
       
       {/* Botão Fixar Atributos */}
@@ -708,11 +708,11 @@ function CharacterSheet({ onFixAttributes }) {
         <div className="mt-4 text-sm text-gray-400">
           <span className="inline-flex items-center gap-2">
             <span className="text-green-400">
-              Sucessos: {successBoxes.filter(Boolean).length}/4
+              Sucessos: {successBoxes.filter(Boolean).length}/3
             </span>
             <span className="text-gray-600">•</span>
             <span className="text-red-400">
-              Fracassos: {failureBoxes.filter(Boolean).length}/4
+              Fracassos: {failureBoxes.filter(Boolean).length}/3
             </span>
           </span>
         </div>
