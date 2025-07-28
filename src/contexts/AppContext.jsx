@@ -236,8 +236,8 @@ const appReducer = (state, action) => {
       };
       
     case ActionTypes.SET_THEME:
-      const validThemes = ['dark', 'light', 'auto'];
-      const theme = validThemes.includes(action.payload) ? action.payload : 'dark';
+      // Accept all theme keys from ThemeProvider
+      const theme = action.payload || 'dark';
       return {
         ...state,
         ui: { ...state.ui, theme }

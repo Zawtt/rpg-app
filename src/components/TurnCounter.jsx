@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from './ThemeProvider';
 
 function TurnCounter() {
   const [turn, setTurn] = useState(1);
   const localStorageKey = 'rpgTurnCounter';
+  const theme = useTheme();
 
   useEffect(() => {
     // ✅ CORREÇÃO: localStorage com verificação de disponibilidade
@@ -47,15 +49,15 @@ function TurnCounter() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 w-24 h-24 text-center select-none transform transition-transform duration-200 hover:scale-105 z-20">
-      <p className="text-gray-400 text-xs font-bold uppercase -mb-1">Turno</p>
-      <div className="text-5xl font-extrabold text-teal-400 leading-none">
+    <div className={`flex flex-col items-center justify-center p-2 ${theme.classes.card} rounded-lg shadow-xl border ${theme.classes.cardBorder} w-24 h-24 text-center select-none transform transition-transform duration-200 hover:scale-105 z-20`}>
+      <p className={`${theme.classes.textSecondary} text-xs font-bold uppercase -mb-1`}>Turno</p>
+      <div className={`text-5xl font-extrabold ${theme.classes.accent} leading-none`}>
         {turn}
       </div>
       <div className="flex w-full justify-between items-center mt-1">
         <button
           onClick={decrementTurn}
-          className="bg-gray-700 hover:bg-gray-600 text-white font-bold px-1.5 py-0.5 rounded-md text-sm transition-colors duration-200"
+          className={`${theme.classes.input} hover:bg-gray-600 text-white font-bold px-1.5 py-0.5 rounded-md text-sm transition-colors duration-200`}
           title="Turno Anterior"
         >
           -
@@ -69,7 +71,7 @@ function TurnCounter() {
         </button>
         <button
           onClick={incrementTurn}
-          className="bg-gray-700 hover:bg-gray-600 text-white font-bold px-1.5 py-0.5 rounded-md text-sm transition-colors duration-200"
+          className={`${theme.classes.input} hover:bg-gray-600 text-white font-bold px-1.5 py-0.5 rounded-md text-sm transition-colors duration-200`}
           title="Próximo Turno"
         >
           +

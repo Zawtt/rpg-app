@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Package, Plus, Trash2, Search, Hash, Eye, X, Edit3, Book } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
 
 function Inventory({ inventoryItems, setInventoryItems }) {
   const [newItem, setNewItem] = useState({ name: '', quantity: 1, description: '' });
@@ -7,6 +8,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [editingIndex, setEditingIndex] = useState(null);
   const modalRef = useRef(null);
+  const theme = useTheme();
 
   // Effect para detectar cliques fora do modal
   useEffect(() => {
@@ -425,7 +427,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from { opacity: 0; }
           to { opacity: 1; }

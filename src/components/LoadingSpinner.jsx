@@ -1,7 +1,10 @@
 import React from 'react';
 import { Loader2, Dices, Save, Download } from 'lucide-react';
+import { useTheme } from './ThemeProvider';
 
 const LoadingSpinner = ({ type = 'default', size = 'md', message, className = '' }) => {
+  const theme = useTheme();
+  
   // Configurações de tamanho
   const sizeClasses = {
     sm: 'w-4 h-4',
@@ -15,22 +18,22 @@ const LoadingSpinner = ({ type = 'default', size = 'md', message, className = ''
     default: {
       icon: Loader2,
       animation: 'animate-spin',
-      color: 'text-blue-400'
+      color: theme.classes.accent
     },
     dice: {
       icon: Dices,
       animation: 'animate-bounce',
-      color: 'text-orange-400'
+      color: theme.classes.accent
     },
     saving: {
       icon: Save,
       animation: 'animate-pulse',
-      color: 'text-emerald-400'
+      color: theme.classes.accent
     },
     loading: {
       icon: Download,
       animation: 'animate-pulse',
-      color: 'text-blue-400'
+      color: theme.classes.accent
     }
   };
 
@@ -43,7 +46,7 @@ const LoadingSpinner = ({ type = 'default', size = 'md', message, className = ''
         className={`${sizeClasses[size]} ${config.color} ${config.animation}`}
       />
       {message && (
-        <span className="text-sm text-gray-400 font-medium">
+        <span className={`text-sm ${theme.classes.textSecondary} font-medium`}>
           {message}
         </span>
       )}
@@ -53,15 +56,17 @@ const LoadingSpinner = ({ type = 'default', size = 'md', message, className = ''
 
 // Componente para loading de página inteira
 export const FullPageLoading = ({ message = 'Carregando...' }) => {
+  const theme = useTheme();
+  
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[9999]">
+    <div className={`fixed inset-0 ${theme.classes.overlay} backdrop-blur-sm flex items-center justify-center z-[9999]`}>
       <div className="text-center">
         <LoadingSpinner 
           type="default" 
           size="xl" 
           className="justify-center mb-4" 
         />
-        <p className="text-gray-300 text-lg font-medium">
+        <p className={`${theme.classes.text} text-lg font-medium`}>
           {message}
         </p>
       </div>
@@ -71,6 +76,8 @@ export const FullPageLoading = ({ message = 'Carregando...' }) => {
 
 // Componente para loading inline
 export const InlineLoading = ({ type, message, size = 'sm' }) => {
+  const theme = useTheme();
+  
   return (
     <div className="inline-flex items-center">
       <LoadingSpinner 
@@ -92,6 +99,8 @@ export const LoadingButton = ({
   className = '',
   ...props 
 }) => {
+  const theme = useTheme();
+  
   return (
     <button
       {...props}

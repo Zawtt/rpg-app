@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Skull, Plus, Trash2, Clock, X } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
+import { useTheme } from './ThemeProvider';
 
 function Debuffs() {
   // ✅ CORREÇÃO: Usar context ao invés de dados mockados
   const { debuffs, setDebuffs, showToast } = useAppContext();
+  const theme = useTheme();
   
   const [newDebuff, setNewDebuff] = useState({ name: '', turns: 1 });
 
@@ -63,11 +65,13 @@ function Debuffs() {
     setDebuffs(updatedDebuffs);
   };
 
+  // Theme já foi importado no topo do componente
+
   return (
-    <div className="debuffs-container bg-gray-950/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-xl">
+    <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl`}>
       {/* Header */}
-      <div className="p-4 border-b border-gray-800">
-        <h3 className="font-semibold text-gray-100 flex items-center gap-2">
+      <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
+        <h3 className={`font-semibold ${theme.classes.text} flex items-center gap-2`}>
           <Skull size={16} className="text-red-400" />
           Debuffs
         </h3>
@@ -82,7 +86,7 @@ function Debuffs() {
               value={newDebuff.name}
               onChange={(e) => setNewDebuff({ ...newDebuff, name: e.target.value })}
               onKeyPress={(e) => e.key === 'Enter' && addDebuff()}
-              className="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+              className={`w-full px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded ${theme.classes.text} focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm`}
               placeholder="Nome do debuff..."
             />
           </div>
@@ -92,12 +96,12 @@ function Debuffs() {
               value={newDebuff.turns}
               onChange={(e) => setNewDebuff({ ...newDebuff, turns: e.target.value })}
               min="1"
-              className="w-20 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-gray-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm"
+              className={`w-20 px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded ${theme.classes.text} focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm`}
               placeholder="Turnos"
             />
             <button
               onClick={addDebuff}
-              className="button-safe flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex items-center justify-center gap-1 text-sm font-medium"
+              className={`button-safe flex-1 px-4 py-2 ${theme.classes.buttonPrimary} text-white rounded transition-colors flex items-center justify-center gap-1 text-sm font-medium`}
             >
               <Plus size={14} />
               Adicionar
@@ -106,9 +110,9 @@ function Debuffs() {
         </div>
 
         {/* Debuffs List */}
-        <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-visible">
+        <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-visible custom-scrollbar">
           {debuffs.length === 0 ? (
-            <p className="text-gray-500 text-sm italic text-center py-4">
+            <p className={`${theme.classes.textSecondary} text-sm italic text-center py-4`}>
               Nenhum debuff ativo
             </p>
           ) : (
@@ -152,7 +156,7 @@ function Debuffs() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .debuffs-container {
           position: relative;
           z-index: 25;

@@ -3,7 +3,7 @@ import { Download, Gamepad2 } from 'lucide-react';
 
 // Context e Providers
 import { AppProvider, useAppContext } from './contexts/AppContext';
-import ThemeProvider from './components/ThemeProvider';
+import ThemeProvider, { useTheme } from './components/ThemeProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Componentes
@@ -44,6 +44,9 @@ function AppContent() {
     setFixedAttributes,
     showToast
   } = useAppContext();
+  
+  // Obter o tema atual
+  const theme = useTheme();
 
   // Hook para exportar dados
   const { exportData } = useAppContext();
@@ -125,16 +128,19 @@ function AppContent() {
   ), [handleRollStart, handleRollEnd]);
 
   return (
-    <div className="min-h-screen text-gray-100">
-      {/* Background Effects otimizados */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/3 rounded-full blur-3xl will-change-transform"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/3 rounded-full blur-3xl will-change-transform"></div>
-        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-indigo-500/3 rounded-full blur-3xl will-change-transform"></div>
+    <div className="min-h-screen text-gray-100 font-sans antialiased">
+      {/* Theme Background */}
+      <div className={`theme-background ${theme.classes.background}`}></div>
+      
+      {/* Background Glow Effects */}
+      <div className="fixed inset-0 z-1 overflow-hidden pointer-events-none">
+        <div className={`absolute top-[10%] left-[5%] w-[30rem] h-[30rem] rounded-full blur-[10rem] opacity-20 background-glow ${theme.effects.glow1}`}></div>
+        <div className={`absolute bottom-[10%] right-[5%] w-[30rem] h-[30rem] rounded-full blur-[10rem] opacity-20 background-glow ${theme.effects.glow2}`}></div>
+        <div className={`absolute top-[40%] right-[25%] w-[20rem] h-[20rem] rounded-full blur-[10rem] opacity-20 background-glow ${theme.effects.glow3}`}></div>
       </div>
 
       {/* Navigation Header */}
-      <header className="relative z-10 border-b border-gray-800/50 backdrop-blur-sm bg-gray-950/80">
+      <header className={`relative z-10 border-b ${theme.classes.cardBorder} backdrop-blur-sm ${theme.classes.card}`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo e Título */}
@@ -184,33 +190,33 @@ function AppContent() {
       {/* Main Content */}
       <main className={`relative z-10 max-w-7xl mx-auto px-6 py-8 transition-transform duration-500 ${
         ui.isShaking ? 'animate-shake' : ''
-      }`}>
+      } main-content`}>
         <div className="grid grid-cols-12 gap-6">
           
           {/* Fixed Attributes Sidebar */}
           <aside className="col-span-12 lg:col-span-2">
-            <div className="bg-gray-950/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-xl sticky top-6">
-              <div className="p-4 border-b border-gray-800">
-                <h3 className="font-semibold text-gray-100 flex items-center gap-2">
-                  <Gamepad2 size={16} className="text-blue-400" />
+            <div className={`${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
+              <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
+                <h3 className={`font-semibold ${theme.classes.text} flex items-center gap-2`}>
+                  <Gamepad2 size={16} className={theme.classes.accent} />
                   Fixed Stats
                 </h3>
                 {computed.hasFixedAttributes && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className={`text-xs ${theme.classes.textSecondary} mt-1`}>
                     {fixedAttributes.length} atributo{fixedAttributes.length !== 1 ? 's' : ''}
                   </div>
                 )}
               </div>
               <div className="p-4 space-y-2 max-h-96 overflow-y-auto">
                 {!computed.hasFixedAttributes ? (
-                  <p className="text-gray-500 text-sm italic">No fixed attributes</p>
+                  <p className={`text-sm ${theme.classes.textSecondary} italic`}>No fixed attributes</p>
                 ) : (
                   fixedAttributes.map((attr, index) => (
-                    <div key={`${attr.name}-${index}`} className="p-2 bg-gray-900/80 rounded border border-gray-700 hover:border-gray-600 transition-colors">
-                      <div className="text-xs text-gray-400 uppercase tracking-wider">
+                    <div key={`${attr.name}-${index}`} className={`p-2 ${theme.classes.input} rounded border ${theme.classes.cardBorder} hover:border-gray-600 transition-colors`}>
+                      <div className={`text-xs ${theme.classes.textSecondary} uppercase tracking-wider`}>
                         {attr.name}
                       </div>
-                      <div className={`text-lg font-bold ${attr.color || 'text-blue-400'}`}>
+                      <div className={`text-lg font-bold ${attr.color || theme.classes.accent}`}>
                         {attr.value}
                       </div>
                     </div>
@@ -252,9 +258,9 @@ function AppContent() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-gray-800/50 mt-12 bg-gray-950/50">
+      <footer className={`relative z-10 border-t ${theme.classes.cardBorder} mt-12 ${theme.classes.card}`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="text-center text-gray-500 text-sm">
+          <div className={`text-center ${theme.classes.textSecondary} text-sm`}>
             <p>Ficha RPG © 2025 - Zawt♥</p>
             {process.env.NODE_ENV === 'development' && (
               <div className="mt-2 space-y-1">
@@ -279,7 +285,7 @@ function AppContent() {
       />
 
       {/* CSS customizado para animações */}
-      <style jsx>{`
+      <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }

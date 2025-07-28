@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from './ThemeProvider';
 
 function NotesTab() {
   const [notes, setNotes] = useState('');
   const localStorageKey = 'rpgCharacterNotes'; // Chave para o localStorage
+  const theme = useTheme();
 
   useEffect(() => {
     // ✅ CORREÇÃO: localStorage com verificação de disponibilidade
@@ -34,10 +36,10 @@ function NotesTab() {
   }, [notes]);
 
   return (
-    <div className="p-4 bg-gray-800/60 rounded-md border border-gray-700">
-      <h4 className="text-2xl font-medium text-purple-300 mb-4">Minhas Anotações</h4>
+    <div className={`p-4 ${theme.classes.card} rounded-md ${theme.classes.cardBorder}`}>
+      <h4 className={`text-2xl font-medium ${theme.classes.accent} mb-4`}>Minhas Anotações</h4>
       <textarea
-        className="w-full p-2 bg-gray-900 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-500 resize-y"
+        className={`w-full p-2 ${theme.classes.input} rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 ${theme.classes.text} placeholder-gray-500 resize-y`}
         rows="15" // Aumentado o número de linhas para mais espaço
         placeholder="Escreva suas anotações, diário de bordo, detalhes de NPC..."
         value={notes}

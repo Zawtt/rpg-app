@@ -571,7 +571,7 @@ function CharacterSheet({ onFixAttributes }) {
   ), [vigor, stealth, strength, adaptability, dexterity, perception, agility, intuition, rarity, athletics, animalHandling, initiative, updateCharacterField]);
 
   return (
-    <div className={`${theme.classes.card} ${theme.classes.cardBorder} backdrop-blur-sm rounded-lg border p-6 relative z-20`}>
+    <div className={`${theme.classes.card} ${theme.classes.cardBorder} backdrop-blur-sm rounded-lg border p-6 relative z-10`}>
       {/* Seção de Informações Básicas */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-lg">

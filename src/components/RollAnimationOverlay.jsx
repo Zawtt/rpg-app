@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTheme } from './ThemeProvider';
 
 // ✅ CORREÇÃO: Audio com verificação de disponibilidade
 const createAudioSafely = (src) => {
@@ -15,6 +16,7 @@ const createAudioSafely = (src) => {
 const diceLandSound = createAudioSafely('/sounds/dice_land.mp3');
 
 function RollAnimationOverlay({ onAnimationEnd }) { // Remove targetRect, targetFontSize, result pois não são mais usados para animação de movimento
+  const theme = useTheme();
   const [animationPhase, setAnimationPhase] = useState('entering'); // 'entering', 'rolling', 'exiting'
   const [displayNumber, setDisplayNumber] = useState(''); // O número aleatório que será mostrado
   const intervalRef = useRef(null); // Para controlar o setInterval da rolagem
@@ -83,14 +85,13 @@ function RollAnimationOverlay({ onAnimationEnd }) { // Remove targetRect, target
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center z-[999] transition-opacity duration-500`}
+      className={`fixed inset-0 flex items-center justify-center z-[90] transition-opacity duration-500 ${theme.classes.overlay}`}
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Fundo preto semi-transparente
         opacity: overlayOpacity
       }}
     >
       <div
-        className={`font-extrabold text-white leading-none select-none text-9xl transition-opacity duration-300`}
+        className={`font-extrabold ${theme.classes.text} leading-none select-none text-9xl transition-opacity duration-300 ${theme.dice.color}`}
         style={{ opacity: numberOpacity }} // Controla a opacidade do número que aparece no centro
       >
         {displayNumber}

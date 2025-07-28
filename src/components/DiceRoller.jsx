@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Dices, History, Play, AlertCircle, Trash2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
+import { useTheme } from './ThemeProvider';
 import { useValidation, useDebounce, useAccessibility } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
 
@@ -106,6 +107,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const { validateDiceExpression } = useValidation();
   const { announce } = useAccessibility();
   const debouncedExpression = useDebounce(expression, 500);
+  const theme = useTheme();
 
   // Validação em tempo real da expressão
   React.useEffect(() => {
@@ -227,14 +229,56 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       announce(`Erro na rolagem: ${error.message}`);
     }
 
-    // Mostrar animação
-    setAnimatingResult(calculatedResult);
+    // Iniciar animação de rolagem com números aleatórios
+    setAnimatingResult('?');
     setShowAnimationOverlay(true);
+    
+    // Gerar números aleatórios para simular rolagem
+    const animationDuration = 2000; // 2 segundos total
+    const updateInterval = 100; // Atualizar a cada 100ms
+    const startTime = Date.now();
+    
+    // Função para gerar um número aleatório baseado no resultado final
+    const generateRandomNumber = () => {
+      // Se o resultado for um número, gerar valores próximos
+      if (!isNaN(calculatedResult) && typeof calculatedResult === 'number') {
+        // Quanto mais próximo do fim da animação, mais próximo do resultado real
+        const elapsedTime = Date.now() - startTime;
+        const progress = Math.min(elapsedTime / animationDuration, 1);
+        
+        // No início, números totalmente aleatórios
+        // No fim, números próximos ao resultado
+        const randomFactor = 1 - progress;
+        const min = Math.max(1, Math.floor(calculatedResult * (1 - randomFactor * 3)));
+        const max = Math.ceil(calculatedResult * (1 + randomFactor * 3));
+        
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+      
+      // Se não for um número, apenas mostrar o resultado
+      return calculatedResult;
+    };
+    
+    // Iniciar a animação de rolagem
+    const animationInterval = setInterval(() => {
+      const elapsedTime = Date.now() - startTime;
+      
+      // Atualizar com número aleatório
+      setAnimatingResult(generateRandomNumber());
+      
+      // Verificar se a animação deve terminar
+      if (elapsedTime >= animationDuration - updateInterval) {
+        clearInterval(animationInterval);
+        // Mostrar o resultado final na última atualização
+        setAnimatingResult(calculatedResult);
+      }
+    }, updateInterval);
 
-    // Simular delay de animação
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Aguardar o término da animação
+    await new Promise(resolve => setTimeout(resolve, animationDuration));
 
     // Finalizar animação
+    clearInterval(animationInterval);
     setShowAnimationOverlay(false);
     
     setTimeout(() => {
@@ -308,9 +352,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       <div className="p-6 space-y-6">
         {/* Expression Input */}
         <div>
-          <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+          <label className={`block text-xs font-medium ${theme.classes.textSecondary} uppercase tracking-wider mb-2`}>
             Expressão de Dados
-            <span className="text-gray-500 normal-case ml-2">(Ex: 2d6+3, 1d20+5)</span>
+            <span className={`${theme.classes.textSecondary} normal-case ml-2`}>(Ex: 2d6+3, 1d20+5)</span>
           </label>
           <div className="relative">
             <input
@@ -320,10 +364,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
               onKeyPress={handleKeyPress}
               disabled={ui.loading.rolling}
               className={`
-                w-full px-4 py-3 rounded text-gray-100 focus:outline-none focus:ring-2 transition-all duration-200 text-sm pr-12
+                w-full px-4 py-3 rounded ${theme.classes.text} focus:outline-none focus:ring-2 transition-all duration-200 text-sm pr-12
                 ${validationError 
                   ? 'bg-red-950/50 border-2 border-red-500 focus:ring-red-500' 
-                  : 'bg-gray-800 border border-gray-700 focus:border-orange-500 focus:ring-orange-500'
+                  : `${theme.classes.input} border ${theme.classes.cardBorder} focus:border-orange-500 focus:ring-orange-500`
                 }
                 ${ui.loading.rolling ? 'opacity-50 cursor-not-allowed' : ''}
               `}
@@ -340,7 +384,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded transition-all duration-200
                 ${ui.loading.rolling || validationError
                   ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-                  : 'bg-orange-600 hover:bg-orange-700 hover:scale-105'
+                  : `${theme.classes.accent} hover:bg-orange-700 hover:scale-105`
                 }
                 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50
               `}
@@ -351,7 +395,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           </div>
           
           {/* Mensagem de ajuda */}
-          <div id="expression-help" className="text-xs text-gray-500 mt-1">
+          <div id="expression-help" className={`text-xs ${theme.classes.textSecondary} mt-1`}>
             {expression.length}/100 caracteres • Pressione Enter ou clique em ▶ para rolar
           </div>
           
@@ -362,15 +406,15 @@ function DiceRoller({ onRollStart, onRollEnd }) {
               className="flex items-center gap-2 mt-2 text-red-400 text-sm"
               role="alert"
             >
-              <AlertCircle size={16} />
-              {validationError}
+              <AlertCircle size={16} className="text-red-400" />
+              <span>Expressão inválida: {validationError}</span>
             </div>
           )}
         </div>
 
         {/* Quick Roll Buttons */}
         <div>
-          <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+          <label className={`block text-xs font-medium ${theme.classes.textSecondary} uppercase tracking-wider mb-2`}>
             Rolagens Rápidas
           </label>
           <div className="grid grid-cols-4 gap-2">
@@ -382,8 +426,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 className={`
                   px-3 py-2 border rounded text-sm font-medium transition-all duration-200
                   ${ui.loading.rolling 
-                    ? 'bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed opacity-50' 
-                    : 'bg-gray-800 hover:bg-gray-700 border-gray-700 hover:border-orange-500 text-gray-300 hover:text-white hover:scale-105'
+                    ? `${theme.classes.input} ${theme.classes.cardBorder} ${theme.classes.textSecondary} cursor-not-allowed opacity-50` 
+                    : `${theme.classes.input} hover:bg-gray-700 ${theme.classes.cardBorder} hover:border-orange-500 ${theme.classes.text} hover:text-white hover:scale-105`
                   }
                   focus:outline-none focus:ring-2 focus:ring-orange-500/50
                 `}
@@ -407,7 +451,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             w-full py-4 font-bold rounded-lg shadow-lg transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/50
             ${validationError 
               ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-              : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 hover:scale-[1.02] text-white'
+              : `${theme.classes.buttonPrimary} hover:scale-[1.02] text-white`
             }
           `}
           aria-label="Rolar dados com a expressão atual"
@@ -422,21 +466,40 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         <div
           ref={finalResultRef}
           className={`
-            p-6 bg-gray-800/80 border border-gray-700 rounded-lg text-center transition-all duration-700 ease-in-out
+            p-6 ${theme.classes.card} border ${theme.classes.cardBorder} rounded-lg text-center transition-all duration-700 ease-in-out relative overflow-hidden
             ${result !== null ? 'opacity-100 transform scale-100' : 'opacity-30 transform scale-95'}
-            ${showResultGlow ? 'ring-2 ring-orange-500/50 shadow-lg shadow-orange-500/20' : ''}
+            ${showResultGlow ? 'ring-4 shadow-xl' : ''}
           `}
+          style={{
+            boxShadow: showResultGlow ? `0 0 20px var(--theme-dice-shadow)` : 'none',
+            borderColor: showResultGlow ? `var(--theme-dice-color)` : 'rgb(55, 65, 81)'
+          }}
           role="status"
           aria-live="polite"
         >
-          <div className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+          {/* Background glow effect */}
+          {showResultGlow && (
+            <div 
+              className="absolute inset-0 opacity-10 dice-animation" 
+              style={{ 
+                background: `radial-gradient(circle, var(--theme-dice-color) 0%, transparent 70%)`,
+              }}
+            />
+          )}
+          
+          <div className={`text-xs ${theme.classes.textSecondary} uppercase tracking-wider mb-2 relative z-10`}>
             Resultado
           </div>
-          <div className={`text-4xl font-extrabold transition-colors duration-300 ${getResultColorClass(result)}`}>
+          <div 
+            className={`dice-result text-5xl font-extrabold transition-all duration-500 relative z-10 ${showResultGlow ? 'dice-animation' : ''}`}
+            style={{
+              textShadow: showResultGlow ? '0 0 10px var(--theme-dice-shadow)' : 'none'
+            }}
+          >
             {result !== null ? result : '?'}
           </div>
           {result !== null && typeof result === 'number' && (
-            <div className="text-xs text-gray-500 mt-2">
+            <div className={`text-sm ${theme.classes.textSecondary} mt-3 relative z-10 font-medium`}>
               {result === 1 && '💀 Falha Crítica!'}
               {result === 20 && '🎉 Sucesso Crítico!'}
               {result >= 15 && result < 20 && '✨ Excelente!'}
@@ -447,21 +510,21 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         </div>
 
         {/* History Section */}
-        <div className="bg-gray-800/80 border border-gray-700 rounded-lg">
-          <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+        <div className={`${theme.classes.card} border ${theme.classes.cardBorder} rounded-lg`}>
+          <div className={`p-4 border-b ${theme.classes.cardBorder} flex items-center justify-between`}>
             <div className="flex items-center gap-2">
-              <History size={16} className="text-gray-400" />
-              <h4 className="text-sm font-medium text-gray-300 uppercase tracking-wider">
+              <History size={16} className={theme.classes.textSecondary} />
+              <h4 className={`text-sm font-medium ${theme.classes.text} uppercase tracking-wider`}>
                 Histórico de Rolagens
               </h4>
-              <span className="text-xs text-gray-500">
+              <span className={`text-xs ${theme.classes.textSecondary}`}>
                 ({diceHistory.length}/10)
               </span>
             </div>
             {diceHistory.length > 0 && (
               <button
                 onClick={clearHistory}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-red-400 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500/50 rounded px-2 py-1"
+                className={`flex items-center gap-1 text-xs ${theme.classes.textSecondary} hover:text-red-400 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500/50 rounded px-2 py-1`}
                 aria-label="Limpar histórico de rolagens"
               >
                 <Trash2 size={12} />
@@ -469,9 +532,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
               </button>
             )}
           </div>
-          <div className="p-4 max-h-48 overflow-y-auto">
+          <div className="p-4 max-h-48 overflow-y-auto custom-scrollbar">
             {diceHistory.length === 0 ? (
-              <p className="text-gray-500 italic text-sm text-center py-4">
+              <p className={`${theme.classes.textSecondary} italic text-sm text-center py-4`}>
                 Nenhuma rolagem realizada ainda
               </p>
             ) : (
@@ -480,10 +543,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                   <li 
                     key={`${entry}-${index}`}
                     className={`
-                      text-gray-400 text-sm font-mono bg-gray-900/50 p-3 rounded border-l-2 transition-all duration-200
+                      ${theme.classes.textSecondary} text-sm font-mono ${theme.classes.input} p-3 rounded border-l-2 transition-all duration-200
                       ${index === 0 
                         ? 'border-orange-500/50 bg-orange-500/5' 
-                        : 'border-gray-600/30 hover:border-gray-500/50'
+                        : `${theme.classes.cardBorder} hover:border-gray-500/50`
                       }
                     `}
                   >
@@ -505,22 +568,40 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
       {/* Animação de Overlay Central */}
       {showAnimationOverlay && (
-        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-          <div className="text-center">
-            <div className="text-8xl font-extrabold text-white animate-bounce-slow mb-4 filter drop-shadow-lg">
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-40 animate-fade-in">
+          <div className="text-center relative">
+            {/* Efeito de brilho por trás do número */}
+            <div className="absolute inset-0 blur-2xl opacity-70 dice-animation" 
+                 style={{ 
+                   backgroundColor: 'rgba(0,0,0,0.5)',
+                   boxShadow: '0 0 40px var(--theme-dice-shadow), 0 0 80px var(--theme-dice-shadow)'
+                 }}>
+            </div>
+            
+            {/* Número principal */}
+            <div className="dice-result text-9xl font-extrabold mb-6 relative z-10 dice-animation"
+                 style={{ 
+                   textShadow: '0 0 20px var(--theme-dice-shadow), 0 0 40px var(--theme-dice-shadow)'
+                 }}>
               {animatingResult}
             </div>
-            <div className="text-xl text-gray-300 animate-pulse">
+            
+            {/* Texto de rolagem */}
+            <div className="text-xl text-gray-300 animate-pulse relative z-10">
               🎲 Rolando dados...
             </div>
-            <div className="mt-4 flex justify-center space-x-2">
-              {[...Array(3)].map((_, i) => (
+            
+            {/* Indicadores de carregamento */}
+            <div className="mt-6 flex justify-center space-x-3 relative z-10">
+              {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="w-3 h-3 bg-orange-500 rounded-full animate-bounce"
+                  className="w-3 h-3 rounded-full animate-bounce"
                   style={{
                     animationDelay: `${i * 0.15}s`,
-                    animationDuration: '0.6s'
+                    animationDuration: '0.6s',
+                    backgroundColor: 'var(--theme-dice-color)',
+                    boxShadow: '0 0 10px var(--theme-dice-shadow)'
                   }}
                 />
               ))}
@@ -539,7 +620,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       )}
 
       {/* CSS customizado para animações */}
-      <style jsx>{`
+      <style>{`
         @keyframes fade-in {
           from { 
             opacity: 0; 

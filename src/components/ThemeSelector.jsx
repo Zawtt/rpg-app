@@ -1,41 +1,17 @@
 import React, { useState } from 'react';
-import { Palette, Check, X } from 'lucide-react';
-
-const themes = {
-  dark: { 
-    name: 'Dark', 
-    description: 'Tema escuro padrão', 
-    classes: { button: 'bg-gray-700 hover:bg-gray-600', text: 'text-white' }, 
-    effects: { primary: 'bg-blue-600', secondary: 'bg-purple-600' } 
-  },
-  cyberpunk: { 
-    name: 'Cyberpunk', 
-    description: 'Neon futurístico', 
-    classes: { button: 'bg-cyan-700 hover:bg-cyan-600', text: 'text-cyan-100' }, 
-    effects: { primary: 'bg-cyan-600', secondary: 'bg-purple-600' } 
-  },
-  medieval: { 
-    name: 'Medieval', 
-    description: 'Fantasia medieval', 
-    classes: { button: 'bg-amber-700 hover:bg-amber-600', text: 'text-amber-100' }, 
-    effects: { primary: 'bg-amber-600', secondary: 'bg-yellow-600' } 
-  },
-  nature: { 
-    name: 'Natureza', 
-    description: 'Verde natural', 
-    classes: { button: 'bg-emerald-700 hover:bg-emerald-600', text: 'text-emerald-100' }, 
-    effects: { primary: 'bg-emerald-600', secondary: 'bg-teal-600' } 
-  }
-};
+import { Palette, Check, X, Sparkles } from 'lucide-react';
+import { themes, useTheme } from './ThemeProvider';
+import { useAppContext } from '../contexts/AppContext';
+import '../index.css'; // Ensure we have access to global styles
 
 const ThemeSelector = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState('dark');
-  
-  const theme = themes[currentTheme] || themes.dark;
+  const { ui, dispatch } = useAppContext();
+  const currentTheme = ui.theme || 'dark';
+  const theme = useTheme();
 
   const handleThemeChange = (themeName) => {
-    setCurrentTheme(themeName);
+    dispatch({ type: 'SET_THEME', payload: themeName });
     console.log(`Tema alterado para ${themes[themeName].name}`);
     setIsOpen(false);
   };
@@ -54,11 +30,16 @@ const ThemeSelector = () => {
     }
   }, [isOpen]);
 
+  // Cores de preview para cada tema
   const themePreviewColors = {
     dark: 'from-gray-800 to-blue-600',
     cyberpunk: 'from-cyan-600 to-purple-600',
     medieval: 'from-amber-700 to-yellow-600',
-    nature: 'from-emerald-700 to-teal-600'
+    nature: 'from-emerald-700 to-teal-600',
+    fire: 'from-red-700 to-orange-600',
+    ice: 'from-blue-700 to-cyan-600',
+    cosmic: 'from-indigo-700 to-violet-600',
+    retro: 'from-fuchsia-700 to-pink-600'
   };
 
   return (
@@ -109,56 +90,66 @@ const ThemeSelector = () => {
             </div>
 
             {/* Lista de Temas */}
-            <div className="p-2">
-              {Object.entries(themes).map(([key, theme]) => (
-                <button
-                  key={key}
-                  onClick={() => handleThemeChange(key)}
-                  className={`
-                    theme-option w-full p-3 rounded-lg border-2 transition-all duration-200 mb-2 text-left
-                    hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50
-                    ${currentTheme === key 
-                      ? 'border-blue-500 bg-blue-500/10' 
-                      : 'border-gray-600 hover:border-gray-500 bg-gray-800/50 hover:bg-gray-800'
-                    }
-                  `}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        {/* Preview colorido */}
-                        <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${themePreviewColors[key]} shadow-lg`} />
-                        
-                        <div>
-                          <h4 className="font-medium text-gray-100">
-                            {theme.name}
-                          </h4>
-                          <p className="text-xs text-gray-400">
-                            {theme.description}
-                          </p>
+            <div className="p-2 max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {Object.entries(themes).map(([key, theme]) => (
+                  <button
+                    key={key}
+                    onClick={() => handleThemeChange(key)}
+                    className={`
+                      theme-option p-3 rounded-lg border-2 transition-all duration-300 text-left
+                      hover:scale-[1.03] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                      ${currentTheme === key 
+                        ? `border-${theme.dice.color.split('-')[1]} bg-${theme.dice.color.split('-')[1]}/10` 
+                        : 'border-gray-600 hover:border-gray-500 bg-gray-800/50 hover:bg-gray-800'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          {/* Preview colorido */}
+                          <div 
+                            className={`w-10 h-10 rounded-lg bg-gradient-to-br ${themePreviewColors[key]} shadow-lg`}
+                            style={{
+                              boxShadow: currentTheme === key ? `0 0 10px var(--theme-dice-shadow)` : 'none'
+                            }}
+                          />
+                          
+                          <div>
+                            <h4 className="font-medium text-gray-100 flex items-center gap-1">
+                              {theme.name}
+                              {key === currentTheme && (
+                                <Sparkles size={14} className={theme.dice.color} />
+                              )}
+                            </h4>
+                            <p className="text-xs text-gray-400">
+                              {theme.description}
+                            </p>
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Indicador de seleção */}
+                      {currentTheme === key && (
+                        <div className={theme.dice.color}>
+                          <Check size={20} />
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Indicador de seleção */}
-                    {currentTheme === key && (
-                      <div className="text-blue-400">
-                        <Check size={20} />
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Preview da paleta */}
-                  <div className="flex gap-1 mt-2">
-                    {Object.entries(theme.effects).map(([effectKey, effectClass]) => (
-                      <div 
-                        key={effectKey}
-                        className={`w-3 h-3 rounded-full ${effectClass.split(' ')[0]} opacity-60`}
-                      />
-                    ))}
-                  </div>
-                </button>
-              ))}
+                    {/* Preview da paleta */}
+                    <div className="flex gap-1 mt-3">
+                      {Object.values(theme.effects).map((effectClass, index) => (
+                        <div 
+                          key={index}
+                          className={`h-2 rounded-full flex-1 ${effectClass.split(' ')[0]} ${currentTheme === key ? effectClass.split(' ')[2] || '' : ''}`}
+                        />
+                      ))}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Footer com informações */}
@@ -177,16 +168,16 @@ const ThemeSelector = () => {
         </>
       )}
 
-      <style jsx>{`
+      <style>{`
         .theme-selector-wrapper {
           position: relative;
-          z-index: 50;
+          z-index: 1000;
           isolation: isolate;
         }
 
         .theme-button {
           position: relative;
-          z-index: 51;
+          z-index: 1001;
         }
 
         .theme-overlay {
@@ -197,13 +188,13 @@ const ThemeSelector = () => {
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(4px);
-          z-index: 52;
+          z-index: 1002;
         }
 
         .theme-dropdown {
-          position: absolute;
-          top: calc(100% + 8px);
-          right: 0;
+          position: fixed;
+          top: 60px;
+          right: 20px;
           width: 320px;
           max-width: 90vw;
           max-height: 384px;
@@ -213,19 +204,19 @@ const ThemeSelector = () => {
           border: 1px solid rgb(55, 65, 81);
           border-radius: 12px;
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-          z-index: 53;
+          z-index: 1003;
           animation: theme-dropdown-in 0.2s ease-out;
           transform-origin: top right;
         }
 
         .theme-close-btn {
           position: relative;
-          z-index: 54;
+          z-index: 1004;
         }
 
         .theme-option {
           position: relative;
-          z-index: 54;
+          z-index: 1004;
         }
 
         @keyframes theme-dropdown-in {
@@ -267,7 +258,7 @@ const ThemeSelector = () => {
 
         /* Garantir que o dropdown fique sempre visível */
         .theme-selector-wrapper .theme-dropdown {
-          z-index: 53 !important;
+          z-index: 1003 !important;
         }
 
         /* Adicionar suporte para tecla Escape */

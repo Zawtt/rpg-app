@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Plus, Trash2, Edit3, Clock, Zap, Shield, Sword, Sparkles, Save, X, Eye, Book } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
+import { useTheme } from './ThemeProvider';
 
 function AbilitiesAndSpells() {
   // ✅ CORREÇÃO: Usar context diretamente
   const { abilities, setAbilities, showToast } = useAppContext();
+  const theme = useTheme();
   
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedSkill, setSelectedSkill] = useState(null);

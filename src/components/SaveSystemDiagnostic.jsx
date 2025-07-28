@@ -13,8 +13,10 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
 import { useSaveSystem } from '../hooks';
+import { useTheme } from './ThemeProvider';
 
 const SaveSystemDiagnostic = ({ isOpen, onClose }) => {
+  const theme = useTheme();
   const [diagnosticResult, setDiagnosticResult] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [selectedTab, setSelectedTab] = useState('overview');
