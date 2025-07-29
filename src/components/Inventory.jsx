@@ -121,15 +121,15 @@ function Inventory({ inventoryItems, setInventoryItems }) {
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Package size={24} className="text-emerald-400" />
+              <Package size={24} className="text-amber-400" />
               <div>
-                <h3 className="text-2xl font-medium text-gray-100">INVENTORY</h3>
-                <div className="w-20 h-0.5 bg-emerald-500 mt-1"></div>
+                <h3 className="text-2xl font-medieval-title text-amber-100">INVENTORY</h3>
+                <div className="w-20 h-0.5 bg-amber-500 mt-1"></div>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-400">Total Items</div>
-              <div className="text-xl font-bold text-emerald-400">{totalItems}</div>
+              <div className="text-sm font-medieval text-amber-400">Total Items</div>
+              <div className="text-xl font-medieval font-bold text-amber-400">{totalItems}</div>
             </div>
           </div>
         </div>
@@ -141,16 +141,16 @@ function Inventory({ inventoryItems, setInventoryItems }) {
               {editingIndex !== null ? (
                 <Edit3 size={20} className="text-amber-500" />
               ) : (
-                <Plus size={20} className="text-emerald-400" />
+                <Plus size={20} className="text-amber-400" />
               )}
-              <h4 className="text-lg font-medium text-gray-100">
+              <h4 className="text-lg font-medieval-title text-amber-100">
                 {editingIndex !== null ? 'EDITAR ITEM' : 'ADICIONAR ITEM'}
               </h4>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                   Nome do Item
                 </label>
                 <input
@@ -158,12 +158,12 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                   value={newItem.name}
                   onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                   onKeyPress={(e) => e.key === 'Enter' && addItem()}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors text-sm"
+                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm placeholder-amber-400/60"
                   placeholder="Long Sword, Health Potion..."
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                   Quantidade
                 </label>
                 <input
@@ -171,18 +171,18 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                   value={newItem.quantity}
                   onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
                   min="1"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors text-sm"
+                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                   Descrição (Opcional)
                 </label>
                 <textarea
                   value={newItem.description}
                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
                   rows="3"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors text-sm resize-none"
+                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm resize-none placeholder-amber-400/60"
                   placeholder="Descrição detalhada do item, efeitos, etc..."
                 />
               </div>
@@ -191,7 +191,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
             <div className="flex gap-3 mt-5">
               <button
                 onClick={addItem}
-                className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-medieval font-medium rounded transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={16} />
                 {editingIndex !== null ? 'ATUALIZAR ITEM' : 'ADICIONAR AO INVENTÁRIO'}
@@ -199,7 +199,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
               {editingIndex !== null && (
                 <button
                   onClick={cancelEdit}
-                  className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-gray-400 rounded transition-colors"
+                  className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-amber-400 font-medieval rounded transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -210,16 +210,16 @@ function Inventory({ inventoryItems, setInventoryItems }) {
           {/* Search */}
           {inventoryItems.length > 0 && (
             <div>
-              <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                 Buscar Itens
               </label>
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-amber-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 rounded text-gray-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors text-sm"
+                  className="w-full pl-10 pr-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm placeholder-amber-400/60"
                   placeholder="Buscar seus itens..."
                 />
               </div>
@@ -229,10 +229,10 @@ function Inventory({ inventoryItems, setInventoryItems }) {
           {/* Items List */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-lg font-medium text-gray-100">
+              <h4 className="text-lg font-medieval-title text-amber-100">
                 SEUS ITENS
               </h4>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm font-medieval text-amber-400">
                 {filteredItems.length} de {inventoryItems.length} itens
               </div>
             </div>
@@ -255,19 +255,19 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                   return (
                     <div
                       key={item.id || `${item.name}-${Math.random()}`}
-                      className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-emerald-500/50 transition-colors"
+                      className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-amber-500/50 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h5 className="text-lg font-medium text-gray-100 mb-1">
+                          <h5 className="text-lg font-medieval font-medium text-amber-100 mb-1">
                             {item.name}
                           </h5>
-                          <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <div className="flex items-center gap-2 text-sm font-medieval text-amber-400">
                             <Hash size={12} />
                             <span>Quantidade: {item.quantity}</span>
                           </div>
                           {item.description && (
-                            <div className="mt-2 text-sm text-gray-500 italic">
+                            <div className="mt-2 text-sm font-medieval text-amber-300/80 italic">
                               {item.description.length > 50 
                                 ? `${item.description.substring(0, 50)}...` 
                                 : item.description
@@ -284,7 +284,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                             >
                               -
                             </button>
-                            <span className="text-lg font-bold text-emerald-400 min-w-[2rem] text-center">
+                            <span className="text-lg font-medieval font-bold text-amber-400 min-w-[2rem] text-center">
                               {item.quantity}
                             </span>
                             <button
@@ -338,17 +338,17 @@ function Inventory({ inventoryItems, setInventoryItems }) {
             className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden animate-in fade-in zoom-in duration-300"
           >
             {/* Header do Modal */}
-            <div className="bg-gradient-to-r from-emerald-600/20 to-green-600/20 border-b border-gray-700 p-6">
+            <div className="bg-gradient-to-r from-amber-600/20 to-orange-600/20 border-b border-gray-700 p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-emerald-600/20 rounded-lg border border-emerald-500/30">
-                    <Package size={28} className="text-emerald-400" />
+                  <div className="p-3 bg-amber-600/20 rounded-lg border border-amber-500/30">
+                    <Package size={28} className="text-amber-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-100">
+                    <h2 className="text-2xl font-medieval-title font-bold text-amber-100">
                       {inventoryItems[selectedItem]?.name}
                     </h2>
-                    <p className="text-emerald-400 text-sm">Detalhes do Item</p>
+                    <p className="text-amber-400 font-medieval text-sm">Detalhes do Item</p>
                   </div>
                 </div>
                 <button
@@ -366,31 +366,31 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                 {/* Informações Principais */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
+                    <h3 className="text-sm font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                       Quantidade
                     </h3>
-                    <div className="text-2xl font-bold text-emerald-400">
+                    <div className="text-2xl font-medieval font-bold text-amber-400">
                       {inventoryItems[selectedItem]?.quantity}
                     </div>
                   </div>
                   
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
+                    <h3 className="text-sm font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                       ID do Item
                     </h3>
-                    <div className="text-lg font-mono text-blue-400">
+                    <div className="text-lg font-medieval text-amber-300">
                       #{inventoryItems[selectedItem]?.id}
                     </div>
                   </div>
                 </div>
 
                 {/* Descrição */}
-                <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-emerald-500">
-                  <h3 className="text-lg font-medium text-gray-100 mb-4 uppercase tracking-wider">
+                <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-amber-500">
+                  <h3 className="text-lg font-medieval-title text-amber-100 mb-4 uppercase tracking-wider">
                      Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-gray-300 leading-relaxed text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
+                    <p className="text-amber-200/90 font-medieval leading-relaxed text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
                       {inventoryItems[selectedItem]?.description || 'Nenhuma descrição disponível para este item.'}
                     </p>
                   </div>

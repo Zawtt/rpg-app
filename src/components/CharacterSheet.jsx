@@ -70,7 +70,7 @@ const ValidatedInput = React.memo(({
     <div className="relative">
       <label 
         htmlFor={id} 
-        className={`block text-sm font-bold mb-1 ${error ? 'text-red-400' : 'text-gray-400'}`}
+        className={`block text-sm font-bold font-medieval mb-1 ${error ? 'text-red-400' : 'text-amber-400'}`}
       >
         {label}:
         {required && <span className="text-red-400 ml-1">*</span>}
@@ -82,12 +82,12 @@ const ValidatedInput = React.memo(({
         onChange={handleChange}
         onBlur={handleBlur}
         className={`
-          w-full p-2 rounded-md focus:outline-none focus:ring-2 transition-all duration-200
+          w-full p-2 rounded-md focus:outline-none focus:ring-2 transition-all duration-200 font-medieval
           ${error 
             ? 'border-2 border-red-500 bg-red-950/20 focus:ring-red-500' 
-            : 'border border-gray-600 bg-gray-900 focus:ring-blue-500'
+            : 'border border-amber-600/50 bg-gray-900/80 focus:ring-amber-500'
           }
-          text-white placeholder-gray-500 ${className}
+          text-amber-100 placeholder-amber-400/60 ${className}
         `}
         placeholder={placeholder}
         maxLength={maxLength}
@@ -617,7 +617,7 @@ function CharacterSheet({ onFixAttributes }) {
               `}
             >
               <Upload size={16} />
-              {imageLoading ? 'CARREGANDO...' : 'CARREGAR IMAGEM'}
+              <span className="font-medieval">{imageLoading ? 'CARREGANDO...' : 'CARREGAR IMAGEM'}</span>
             </label>
             
             <div id="image-help" className="text-xs text-gray-500 mt-2 text-center">
@@ -639,7 +639,7 @@ function CharacterSheet({ onFixAttributes }) {
 
       {/* Seção de Status Principais */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4 uppercase tracking-wider">
+        <h3 className="text-lg font-semibold font-medieval-title text-amber-100 mb-4 uppercase tracking-wider">
           Status Principais
         </h3>
         {statusFields}
@@ -647,7 +647,7 @@ function CharacterSheet({ onFixAttributes }) {
 
       {/* Seção de Atributos Secundários */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-100 mb-4 uppercase tracking-wider">
+        <h3 className="text-lg font-semibold font-medieval-title text-amber-100 mb-4 uppercase tracking-wider">
           Atributos Secundários
         </h3>
         {secondaryAttributesFields}
@@ -655,7 +655,7 @@ function CharacterSheet({ onFixAttributes }) {
 
       {/* Seção Balança da Vida */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700 text-center">
-        <h4 className="text-2xl font-medium text-orange-300 mb-4 uppercase tracking-wider">
+        <h4 className="text-2xl font-medium font-medieval-title text-amber-300 mb-4 uppercase tracking-wider">
           BALANÇA DA VIDA
         </h4>
         <div className="flex justify-center items-center space-x-8">

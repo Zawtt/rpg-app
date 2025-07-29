@@ -2,14 +2,10 @@ import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { Dices, History, Play, AlertCircle, Trash2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
 import { useTheme } from './ThemeProvider';
-import { useValidation, useDebounce, useAccessibility } from '../hooks';
+import { useValidation, useDebounce, useAccessibility, useSounds } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
 
-// Sons - simulados (não funcionam em artifacts)
-const playSound = (soundName) => {
-  // Simular reprodução de som
-  console.log(`🔊 Playing sound: ${soundName}`);
-};
+
 
 // ✅ CORREÇÃO: Parser seguro para expressões matemáticas
 const safeEvaluateExpression = (expression) => {
@@ -106,6 +102,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const { ui, showToast, setLoading } = useAppContext();
   const { validateDiceExpression } = useValidation();
   const { announce } = useAccessibility();
+  const { playDiceRollSound, playDiceLandSound } = useSounds();
   const debouncedExpression = useDebounce(expression, 500);
   const theme = useTheme();
 
@@ -162,8 +159,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     setLoading({ rolling: true });
     onRollStart?.();
 
-    // Reproduzir som
-    playSound('dice_roll');
+    // Reproduzir som de rolagem
+    playDiceRollSound();
 
     // Limpar estados anteriores
     setResult(null);
@@ -296,8 +293,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       setLoading({ rolling: false });
       onRollEnd?.();
       
-      // Som de pouso
-      playSound('dice_land');
+      // Som de aterrissagem dos dados
+      playDiceLandSound();
       
       // Remover glow após um tempo
       setTimeout(() => setShowResultGlow(false), 2000);
@@ -342,19 +339,19 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl relative overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-800">
-        <h3 className="text-2xl font-medium text-gray-100 flex items-center gap-3">
-          <Dices size={24} className="text-orange-400" />
+        <h3 className="text-2xl font-medieval-title text-amber-100 flex items-center gap-3">
+          <Dices size={24} className="text-amber-400" />
           DICE ROLLER
         </h3>
-        <div className="w-20 h-0.5 bg-orange-500 mt-2"></div>
+        <div className="w-20 h-0.5 bg-amber-500 mt-2"></div>
       </div>
 
       <div className="p-6 space-y-6">
         {/* Expression Input */}
         <div>
-          <label className={`block text-xs font-medium ${theme.classes.textSecondary} uppercase tracking-wider mb-2`}>
+          <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
             Expressão de Dados
-            <span className={`${theme.classes.textSecondary} normal-case ml-2`}>(Ex: 2d6+3, 1d20+5)</span>
+            <span className={`text-amber-300/80 normal-case ml-2`}>(Ex: 2d6+3, 1d20+5)</span>
           </label>
           <div className="relative">
             <input
@@ -364,10 +361,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
               onKeyPress={handleKeyPress}
               disabled={ui.loading.rolling}
               className={`
-                w-full px-4 py-3 rounded ${theme.classes.text} focus:outline-none focus:ring-2 transition-all duration-200 text-sm pr-12
+                w-full px-4 py-3 rounded font-medieval text-amber-100 bg-gray-800/80 border border-amber-600/50 focus:outline-none focus:ring-2 transition-all duration-200 text-sm pr-12 placeholder-amber-400/60
                 ${validationError 
                   ? 'bg-red-950/50 border-2 border-red-500 focus:ring-red-500' 
-                  : `${theme.classes.input} border ${theme.classes.cardBorder} focus:border-orange-500 focus:ring-orange-500`
+                  : 'focus:border-amber-500 focus:ring-amber-500'
                 }
                 ${ui.loading.rolling ? 'opacity-50 cursor-not-allowed' : ''}
               `}
@@ -384,9 +381,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 absolute right-2 top-1/2 transform -translate-y-1/2 p-2 rounded transition-all duration-200
                 ${ui.loading.rolling || validationError
                   ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-                  : `${theme.classes.accent} hover:bg-orange-700 hover:scale-105`
+                  : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 hover:scale-105'
                 }
-                text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50
+                text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50
               `}
               aria-label="Rolar dados"
             >
@@ -395,7 +392,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           </div>
           
           {/* Mensagem de ajuda */}
-          <div id="expression-help" className={`text-xs ${theme.classes.textSecondary} mt-1`}>
+          <div id="expression-help" className={`text-xs font-medieval text-amber-300/80 mt-1`}>
             {expression.length}/100 caracteres • Pressione Enter ou clique em ▶ para rolar
           </div>
           
@@ -414,7 +411,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
         {/* Quick Roll Buttons */}
         <div>
-          <label className={`block text-xs font-medium ${theme.classes.textSecondary} uppercase tracking-wider mb-2`}>
+          <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
             Rolagens Rápidas
           </label>
           <div className="grid grid-cols-4 gap-2">
@@ -424,12 +421,12 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 onClick={() => handleQuickRoll(dice.value)}
                 disabled={ui.loading.rolling}
                 className={`
-                  px-3 py-2 border rounded text-sm font-medium transition-all duration-200
+                  px-3 py-2 border rounded text-sm font-medieval font-medium transition-all duration-200
                   ${ui.loading.rolling 
-                    ? `${theme.classes.input} ${theme.classes.cardBorder} ${theme.classes.textSecondary} cursor-not-allowed opacity-50` 
-                    : `${theme.classes.input} hover:bg-gray-700 ${theme.classes.cardBorder} hover:border-orange-500 ${theme.classes.text} hover:text-white hover:scale-105`
+                    ? 'bg-gray-800/50 border-gray-600 text-gray-500 cursor-not-allowed opacity-50' 
+                    : 'bg-gray-800/80 border-amber-600/50 text-amber-100 hover:bg-amber-900/50 hover:border-amber-500 hover:text-amber-50 hover:scale-105'
                   }
-                  focus:outline-none focus:ring-2 focus:ring-orange-500/50
+                  focus:outline-none focus:ring-2 focus:ring-amber-500/50
                 `}
                 title={dice.description}
                 aria-label={`Rolar ${dice.description}`}
@@ -448,10 +445,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           loadingType="dice"
           disabled={validationError !== ''}
           className={`
-            w-full py-4 font-bold rounded-lg shadow-lg transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-500/50
+            w-full py-4 font-medieval font-bold rounded-lg shadow-lg transform transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-amber-500/50
             ${validationError 
               ? 'bg-gray-600 cursor-not-allowed opacity-50' 
-              : `${theme.classes.buttonPrimary} hover:scale-[1.02] text-white`
+              : 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 hover:scale-[1.02] text-white'
             }
           `}
           aria-label="Rolar dados com a expressão atual"
@@ -487,7 +484,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             />
           )}
           
-          <div className={`text-xs ${theme.classes.textSecondary} uppercase tracking-wider mb-2 relative z-10`}>
+          <div className={`text-xs font-medieval text-amber-400 uppercase tracking-wider mb-2 relative z-10`}>
             Resultado
           </div>
           <div 
@@ -499,7 +496,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             {result !== null ? result : '?'}
           </div>
           {result !== null && typeof result === 'number' && (
-            <div className={`text-sm ${theme.classes.textSecondary} mt-3 relative z-10 font-medium`}>
+            <div className={`text-sm font-medieval text-amber-300/80 mt-3 relative z-10 font-medium`}>
               {result === 1 && '💀 Falha Crítica!'}
               {result === 20 && '🎉 Sucesso Crítico!'}
               {result >= 15 && result < 20 && ' Excelente!'}

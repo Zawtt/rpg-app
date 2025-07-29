@@ -1,6 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Uncial+Antiqua&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Medieval Font Classes */
+.font-medieval {
+  font-family: 'Cinzel', serif;
+}
+
+.font-medieval-title {
+  font-family: 'Uncial Antiqua', cursive;
+}
+
+/* Enhanced Theme Colors */
+:root {
+  --medieval-gold: #d4af37;
+  --medieval-bronze: #cd7f32;
+  --medieval-crimson: #dc143c;
+  --medieval-forest: #228b22;
+  --medieval-royal: #4b0082;
+  --shadow-glow: 0 0 20px rgba(212, 175, 55, 0.3);
+}
 
 /* Custom Scrollbar Styles */
 .custom-scrollbar::-webkit-scrollbar {

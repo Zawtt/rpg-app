@@ -68,7 +68,7 @@ function Debuffs() {
   // Theme já foi importado no topo do componente
 
   return (
-    <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl`}>
+    <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
       {/* Header */}
       <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
         <h3 className={`font-semibold ${theme.classes.text} flex items-center gap-2`}>
@@ -110,7 +110,7 @@ function Debuffs() {
         </div>
 
         {/* Debuffs List */}
-        <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-visible custom-scrollbar">
+        <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
           {debuffs.length === 0 ? (
             <p className={`${theme.classes.textSecondary} text-sm italic text-center py-4`}>
               Nenhum debuff ativo
@@ -123,8 +123,8 @@ function Debuffs() {
                 onClick={() => decreaseTurn(debuff.id)}
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className={`font-medium ${debuff.color.text} text-sm truncate`}>
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className={`font-medium ${debuff.color.text} text-sm break-words`}>
                       {debuff.name}
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">

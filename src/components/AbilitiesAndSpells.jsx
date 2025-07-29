@@ -204,10 +204,10 @@ function AbilitiesAndSpells() {
       <div className="abilities-container bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-800">
-          <h3 className="text-2xl font-medium text-gray-100 flex items-center gap-3">
-            <Sparkles size={24} className="text-purple-400" />
-            HABILIDADES
-          </h3>
+          <h3 className="text-2xl font-medium font-medieval-title text-amber-100 flex items-center gap-3">
+              <Sparkles size={24} className="text-amber-400" />
+              HABILIDADES
+            </h3>
           <div className="w-20 h-0.5 bg-purple-500 mt-2"></div>
         </div>
 
@@ -220,9 +220,9 @@ function AbilitiesAndSpells() {
               ) : (
                 <Plus size={20} className="text-gray-400" />
               )}
-              <h4 className="text-lg font-medium text-gray-100">
-                {editingIndex !== null ? 'EDITAR HABILIDADE' : 'NOVA HABILIDADE'}
-              </h4>
+              <h4 className="text-lg font-medium font-medieval text-amber-100">
+                  {editingIndex !== null ? 'EDITAR HABILIDADE' : 'NOVA HABILIDADE'}
+                </h4>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -280,13 +280,12 @@ function AbilitiesAndSpells() {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  rows="3"
-                  maxLength={500}
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors text-sm resize-none"
+                  rows="4"
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors text-sm resize-y min-h-[100px]"
                   placeholder="Descreva o efeito da habilidade..."
                 />
                 <div className="text-xs text-gray-500 mt-1 text-right">
-                  {formData.description.length}/500
+                  {formData.description.length} caracteres
                 </div>
               </div>
             </div>
@@ -314,7 +313,7 @@ function AbilitiesAndSpells() {
           {/* Abilities Grid */}
           <div className="abilities-grid">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="text-lg font-medium text-gray-100">
+              <h4 className="text-lg font-medium font-medieval text-amber-100">
                 REGISTRO DE HABILIDADES
               </h4>
               <div className="text-sm text-gray-400">
@@ -333,12 +332,16 @@ function AbilitiesAndSpells() {
                 {abilities.map((skill, index) => (
                   <div
                     key={skill.id || `skill-${index}`}
-                    className={`group relative bg-gray-800 border rounded-lg transition-all duration-300 ${
+                    className={`group relative bg-gray-800 border rounded-lg transition-all duration-300 overflow-hidden ${
                       skill.isOnCooldown 
                         ? 'border-gray-700 bg-gray-850 opacity-60' 
                         : 'border-gray-700 hover:border-purple-500 hover:bg-gray-750 cursor-pointer'
                     }`}
-                    onClick={() => {
+                    onClick={(e) => {
+                      // Prevenir clique se for nos botões de ação
+                      if (e.target.closest('.action-buttons')) {
+                        return;
+                      }
                       skill.isOnCooldown ? decreaseCooldown(index) : useSkill(index);
                     }}
                   >
@@ -360,22 +363,22 @@ function AbilitiesAndSpells() {
                     )}
 
                     <div className="p-5">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="text-purple-400 flex-shrink-0">
+                      <div className="relative mb-3">
+                        <div className="flex items-start gap-3 pr-24">
+                          <div className="text-purple-400 flex-shrink-0 mt-1">
                             {getRandomIcon()}
                           </div>
-                          <h3 className="text-lg font-medium text-gray-100 truncate">
+                          <h3 className="text-lg font-medium font-medieval text-amber-100 break-words leading-tight flex-1">
                             {skill.name}
                           </h3>
                         </div>
-                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <div className="action-buttons absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-20">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEdit(index);
                             }}
-                            className="bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 hover:border-blue-500/50 text-blue-400 hover:text-blue-300 p-2 rounded-lg transition-all shadow-lg"
+                            className="bg-blue-500/30 hover:bg-blue-500/50 border border-blue-500/50 hover:border-blue-500/70 text-blue-200 hover:text-white p-2 rounded-md transition-all shadow-lg backdrop-blur-sm"
                             title="Editar habilidade"
                           >
                             <Edit3 size={14} />
@@ -387,7 +390,7 @@ function AbilitiesAndSpells() {
                                 handleDelete(index);
                               }
                             }}
-                            className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 hover:text-red-300 p-2 rounded-lg transition-all shadow-lg"
+                            className="bg-red-500/30 hover:bg-red-500/50 border border-red-500/50 hover:border-red-500/70 text-red-200 hover:text-white p-2 rounded-md transition-all shadow-lg backdrop-blur-sm"
                             title="Deletar habilidade"
                           >
                             <Trash2 size={14} />
@@ -395,22 +398,22 @@ function AbilitiesAndSpells() {
                         </div>
                       </div>
                       
-                      <div className="flex gap-3 mb-3 flex-wrap">
-                        <span className="inline-flex items-center px-3 py-1 bg-gray-700 text-gray-300 rounded text-xs font-medium">
-                          {skill.cost}
+                      <div className="flex gap-3 mb-4 flex-wrap">
+                        <span className="inline-flex items-center px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
+                          💰 {skill.cost}
                         </span>
-                        <span className="inline-flex items-center gap-1 px-3 py-1 bg-gray-700 text-gray-300 rounded text-xs font-medium">
-                          <Clock size={12} />
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
+                          <Clock size={14} />
                           {skill.maxCooldown || skill.cooldown || 0}T
                         </span>
                       </div>
 
                       {!skill.isOnCooldown && (
-                        <div className="mt-3 text-xs text-gray-500 italic">
-                          Clique para usar • 
+                        <div className="mt-4 pt-3 border-t border-gray-700/50 text-xs font-medieval text-amber-400 italic">
+                          🎯 Clique para usar • 
                           <button 
                             onClick={(e) => openSkillModal(index, e)}
-                            className="ml-1 text-blue-400 hover:text-blue-300 underline"
+                            className="ml-1 text-amber-400 hover:text-amber-300 underline transition-colors"
                           >
                             Ver detalhes
                           </button>
@@ -440,10 +443,10 @@ function AbilitiesAndSpells() {
                     <Book size={28} className="text-purple-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-100">
+                    <h2 className="text-2xl font-bold font-medieval-title text-amber-100">
                       {abilities[selectedSkill]?.name}
                     </h2>
-                    <p className="text-purple-400 text-sm">Detalhes da Habilidade</p>
+                    <p className="text-amber-400 text-sm font-medieval">Detalhes da Habilidade</p>
                   </div>
                 </div>
                 <button
@@ -498,7 +501,7 @@ function AbilitiesAndSpells() {
 
                 {/* Descrição */}
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-purple-500">
-                  <h3 className="text-lg font-medium text-gray-100 mb-4 uppercase tracking-wider">
+                  <h3 className="text-lg font-medium font-medieval text-amber-100 mb-4 uppercase tracking-wider">
                     📖 Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">

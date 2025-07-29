@@ -128,7 +128,7 @@ function AppContent() {
   ), [handleRollStart, handleRollEnd]);
 
   return (
-    <div className="min-h-screen text-gray-100 font-sans antialiased">
+    <div className="min-h-screen text-gray-100 font-medieval antialiased">
       {/* Theme Background */}
       <div className={`theme-background ${theme.classes.background}`}></div>
       
@@ -153,10 +153,10 @@ function AppContent() {
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold font-medieval-title bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600 bg-clip-text text-transparent drop-shadow-lg">
                   FICHA RPG
                 </h1>
-                <p className="text-sm text-gray-400">System created solely for the CICLO DE DOZE LUAS</p>
+                <p className="text-sm text-amber-300/80 font-medieval">System created solely for the CICLO DE DOZE LUAS</p>
               </div>
             </div>
             
@@ -169,7 +169,7 @@ function AppContent() {
               {/* Botão Exportar */}
               <button
                 onClick={handleExportData}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-700 hover:from-amber-700 hover:to-orange-800 text-white rounded-lg font-medium font-medieval transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500/50 border border-amber-500/30"
                 title="Exportar dados como JSON"
               >
                 <Download size={16} />
@@ -177,8 +177,8 @@ function AppContent() {
               </button>
               
               {/* Indicador de Auto-Save */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-green-600/20 border border-green-600/30 text-green-400 rounded-lg text-sm">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 rounded-lg text-sm font-medieval">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-lg shadow-emerald-400/50"></div>
                 <span className="hidden sm:inline">Auto-Save Ativo</span>
                 <span className="sm:hidden">Auto</span>
               </div>

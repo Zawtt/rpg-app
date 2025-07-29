@@ -344,6 +344,34 @@ export const useAnimations = () => {
   };
 };
 
+// Hook para sons de rolagem
+export const useSounds = () => {
+  const playDiceRollSound = useCallback(() => {
+    try {
+      const audio = new Audio('/rpg-app/sounds/dice_roll.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(e => console.log('Não foi possível reproduzir o som:', e));
+    } catch (error) {
+      console.log('Som não disponível:', error);
+    }
+  }, []);
+
+  const playDiceLandSound = useCallback(() => {
+    try {
+      const audio = new Audio('/rpg-app/sounds/dice_land.mp3');
+      audio.volume = 0.4;
+      audio.play().catch(e => console.log('Não foi possível reproduzir o som:', e));
+    } catch (error) {
+      console.log('Som não disponível:', error);
+    }
+  }, []);
+
+  return {
+    playDiceRollSound,
+    playDiceLandSound
+  };
+};
+
 // Hook para gerenciamento de foco e acessibilidade
 export const useAccessibility = () => {
   const [announceMessage, setAnnounceMessage] = useState('');
