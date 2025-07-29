@@ -273,7 +273,7 @@ function AbilitiesAndSpells() {
               </div>
               
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                   Descrição *
                 </label>
                 <textarea
@@ -281,7 +281,8 @@ function AbilitiesAndSpells() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="4"
-                  className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded text-gray-100 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-colors text-sm resize-y min-h-[100px]"
+                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm resize-y min-h-[100px] break-words word-break-break-word overflow-wrap-break-word hyphens-auto placeholder-amber-400/60"
+                  style={{whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word'}}
                   placeholder="Descreva o efeito da habilidade..."
                 />
                 <div className="text-xs text-gray-500 mt-1 text-right">
@@ -400,7 +401,7 @@ function AbilitiesAndSpells() {
                       
                       <div className="flex gap-3 mb-4 flex-wrap">
                         <span className="inline-flex items-center px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
-                          💰 {skill.cost}
+                           {skill.cost}
                         </span>
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
                           <Clock size={14} />
@@ -410,7 +411,7 @@ function AbilitiesAndSpells() {
 
                       {!skill.isOnCooldown && (
                         <div className="mt-4 pt-3 border-t border-gray-700/50 text-xs font-medieval text-amber-400 italic">
-                          🎯 Clique para usar • 
+                           Clique para usar • 
                           <button 
                             onClick={(e) => openSkillModal(index, e)}
                             className="ml-1 text-amber-400 hover:text-amber-300 underline transition-colors"
@@ -464,26 +465,26 @@ function AbilitiesAndSpells() {
                 {/* Informações Principais */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
+                    <h3 className="text-sm font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                       Custo
                     </h3>
-                    <div className="text-2xl font-bold text-purple-400">
+                    <div className="text-2xl font-medieval font-bold text-amber-400">
                       {abilities[selectedSkill]?.cost}
                     </div>
                   </div>
                   
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
+                    <h3 className="text-sm font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                       Cooldown
                     </h3>
-                    <div className="text-2xl font-bold text-blue-400 flex items-center gap-2">
-                      <Clock size={20} />
+                    <div className="text-2xl font-medieval font-bold text-amber-400 flex items-center gap-2">
+                      <Clock size={20} className="text-amber-400" />
                       {abilities[selectedSkill]?.maxCooldown || abilities[selectedSkill]?.cooldown || 0} Turnos
                     </div>
                   </div>
 
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-2">
+                    <h3 className="text-sm font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
                       Status
                     </h3>
                     <div className={`text-lg font-bold ${
@@ -502,10 +503,10 @@ function AbilitiesAndSpells() {
                 {/* Descrição */}
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-purple-500">
                   <h3 className="text-lg font-medium font-medieval text-amber-100 mb-4 uppercase tracking-wider">
-                    📖 Descrição
+                     Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-gray-300 leading-relaxed text-base whitespace-pre-wrap">
+                    <p className="text-amber-200/90 font-medieval leading-relaxed text-base break-words word-break-break-word overflow-wrap-break-word hyphens-auto" style={{whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                       {abilities[selectedSkill]?.description}
                     </p>
                   </div>

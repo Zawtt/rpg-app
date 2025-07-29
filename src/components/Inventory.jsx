@@ -182,7 +182,8 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                   value={newItem.description}
                   onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
                   rows="3"
-                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm resize-none placeholder-amber-400/60"
+                  className="w-full px-4 py-3 font-medieval bg-gray-800/80 border border-amber-600/50 rounded text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm resize-none placeholder-amber-400/60 break-words word-break-break-word overflow-wrap-break-word hyphens-auto"
+                  style={{whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word'}}
                   placeholder="Descrição detalhada do item, efeitos, etc..."
                 />
               </div>
@@ -267,7 +268,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                             <span>Quantidade: {item.quantity}</span>
                           </div>
                           {item.description && (
-                            <div className="mt-2 text-sm font-medieval text-amber-300/80 italic">
+                            <div className="mt-2 text-sm font-medieval text-amber-300/80 italic break-words" style={{wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                               {item.description.length > 50 
                                 ? `${item.description.substring(0, 50)}...` 
                                 : item.description
@@ -390,7 +391,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                      Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">
-                    <p className="text-amber-200/90 font-medieval leading-relaxed text-base break-words whitespace-pre-wrap overflow-wrap-anywhere">
+                    <p className="text-amber-200/90 font-medieval leading-relaxed text-base break-words word-break-break-word overflow-wrap-break-word hyphens-auto" style={{whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word'}}>
                       {inventoryItems[selectedItem]?.description || 'Nenhuma descrição disponível para este item.'}
                     </p>
                   </div>
