@@ -24,7 +24,7 @@ export default {
           },
           '50%': {
             textShadow: '0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6)',
-            transform: 'scale(1.05)', // Leve pulsação
+            transform: 'scale(1.05)', // Leve pulsaçãoo
           },
         },
       },

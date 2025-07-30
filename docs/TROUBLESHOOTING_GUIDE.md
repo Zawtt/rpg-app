@@ -1,6 +1,6 @@
 # Guia de Troubleshooting - Sistema de Salvamento RPG
 
-## Visão Geral
+## Visão Gerall
 
 Este guia fornece instruções detalhadas para diagnosticar e resolver problemas no sistema de salvamento do aplicativo RPG. O sistema foi projetado com múltiplas camadas de proteção e recuperação automática.
 
