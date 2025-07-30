@@ -1,8 +1,6 @@
 @font-face {
   font-family: 'Storm Gust';
-  src: url('./Storm Gust.woff2') format('woff2'),
-       url('./Storm Gust.woff') format('woff'),
-       url('./Storm Gust.ttf') format('truetype'),
+  src: url('./Storm Gust.ttf') format('truetype'),
        url('./Storm Gust.otf') format('opentype');
   font-weight: normal;
   font-style: normal;

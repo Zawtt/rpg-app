@@ -68,7 +68,7 @@ function Debuffs() {
   // Theme já foi importado no topo do componente
 
   return (
-    <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
+    <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl`}>
       {/* Header */}
       <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
         <h3 className={`font-semibold font-medieval text-amber-100 flex items-center gap-2`}>

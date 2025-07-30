@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Package, Plus, Trash2, Search, Hash, Eye, X, Edit3, Book } from 'lucide-react';
+import { Package, Plus, Trash2, Search, Hash, Eye, X, Edit3, Book, Save, Settings } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
+import { useAppContext } from '../contexts/AppContext';
 
 function Inventory({ inventoryItems, setInventoryItems }) {
+  const { theme } = useTheme();
+  const { showNotification } = useAppContext();
   const [newItem, setNewItem] = useState({ name: '', quantity: 1, description: '' });
+  const [editingIndex, setEditingIndex] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editMode, setEditMode] = useState(false);
   const modalRef = useRef(null);
-  const theme = useTheme();
+  const formRef = useRef(null);
 
   // Effect para detectar cliques fora do modal
   useEffect(() => {
@@ -35,37 +39,51 @@ function Inventory({ inventoryItems, setInventoryItems }) {
     };
   }, [selectedItem]);
 
-  const addItem = () => {
-    if (newItem.name.trim() !== '') {
-      if (editingIndex !== null) {
-        // Editando item existente
-        setInventoryItems(prevItems => 
-          prevItems.map((item, index) => 
-            index === editingIndex 
-              ? { 
-                  ...item,
-                  name: newItem.name.trim(),
-                  quantity: parseInt(newItem.quantity) || 1,
-                  description: newItem.description.trim() || ''
-                }
-              : item
-          )
-        );
-        setEditingIndex(null);
-      } else {
-        // Novo item
-        setInventoryItems(prevItems => [
-          ...prevItems,
-          { 
-            id: Date.now(),
-            name: newItem.name.trim(), 
-            quantity: parseInt(newItem.quantity) || 1,
-            description: newItem.description.trim() || ''
-          }
-        ]);
-      }
-      setNewItem({ name: '', quantity: 1, description: '' });
+  const validateItem = () => {
+    if (!newItem.name.trim()) {
+      showNotification('Nome do item é obrigatório', 'error');
+      return false;
     }
+    if (newItem.quantity < 1) {
+      showNotification('Quantidade deve ser maior que 0', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  const addItem = () => {
+    if (!validateItem()) return;
+    
+    if (editingIndex !== null) {
+      // Editando item existente
+      setInventoryItems(prevItems => 
+        prevItems.map((item, index) => 
+          index === editingIndex 
+            ? { 
+                ...item,
+                name: newItem.name.trim(),
+                quantity: parseInt(newItem.quantity) || 1,
+                description: newItem.description.trim() || ''
+              }
+            : item
+        )
+      );
+      setEditingIndex(null);
+      showNotification('Item atualizado com sucesso!', 'success');
+    } else {
+      // Novo item
+      setInventoryItems(prevItems => [
+        ...prevItems,
+        { 
+          id: Date.now(),
+          name: newItem.name.trim(), 
+          quantity: parseInt(newItem.quantity) || 1,
+          description: newItem.description.trim() || ''
+        }
+      ]);
+      showNotification('Item adicionado com sucesso!', 'success');
+    }
+    setNewItem({ name: '', quantity: 1, description: '' });
   };
 
   const handleEdit = (index) => {
@@ -81,6 +99,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
   const cancelEdit = () => {
     setEditingIndex(null);
     setNewItem({ name: '', quantity: 1, description: '' });
+    setEditMode(false);
   };
 
   const removeItem = (idToRemove) => {
@@ -88,6 +107,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
     if (selectedItem !== null && inventoryItems[selectedItem]?.id === idToRemove) {
       setSelectedItem(null);
     }
+    showNotification('Item removido com sucesso!', 'success');
   };
 
   const updateQuantity = (id, newQuantity) => {
@@ -127,9 +147,23 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                 <div className="w-20 h-0.5 bg-amber-500 mt-1"></div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm font-medieval text-amber-400">Total Items</div>
-              <div className="text-xl font-medieval font-bold text-amber-400">{totalItems}</div>
+            <div className="flex items-center gap-4">
+              {/* Botão Modo de Edição */}
+              <button
+                onClick={() => setEditMode(!editMode)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medieval text-sm transition-all duration-200 ${
+                  editMode
+                    ? 'bg-amber-600/20 text-amber-400 border border-amber-500/50'
+                    : 'bg-gray-700/50 text-gray-400 border border-gray-600/50 hover:bg-gray-600/50 hover:text-gray-300'
+                }`}
+              >
+                <Settings size={16} />
+                {editMode ? 'Sair do Modo Edição' : 'Modo Edição'}
+              </button>
+              <div className="text-right">
+                <div className="text-sm font-medieval text-amber-400">Total Items</div>
+                <div className="text-xl font-medieval font-bold text-amber-400">{totalItems}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -305,21 +339,26 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                             <Eye size={16} />
                           </button>
                           
-                          <button
-                            onClick={() => handleEdit(originalIndex)}
-                            className="p-2 text-gray-500 hover:text-amber-400 transition-colors rounded"
-                            title="Editar item"
-                          >
-                            <Edit3 size={16} />
-                          </button>
-                          
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
-                            title="Remover item"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {/* Botões de Edição - Apenas no Modo Edição */}
+                          {editMode && (
+                            <>
+                              <button
+                                onClick={() => handleEdit(originalIndex)}
+                                className="p-2 text-gray-500 hover:text-amber-400 transition-colors rounded"
+                                title="Editar item"
+                              >
+                                <Edit3 size={16} />
+                              </button>
+                              
+                              <button
+                                onClick={() => removeItem(item.id)}
+                                className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                title="Remover item"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

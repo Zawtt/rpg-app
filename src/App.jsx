@@ -236,7 +236,7 @@ function AppContent() {
             </div>
             
             {/* Debuffs Section */}
-            <div className="mt-6">
+            <div className="mt-6 sticky top-6">
               {memoizedDebuffs}
             </div>
           </aside>
