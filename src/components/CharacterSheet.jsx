@@ -321,7 +321,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={age}
         onChange={(e) => updateCharacterField('age', e.target.value)}
         min={0}
-        max={9999}
+        max={99999}
         placeholder="Anos"
       />
       <ValidatedInput
@@ -356,7 +356,7 @@ function CharacterSheet({ onFixAttributes }) {
         onChange={(e) => updateCharacterField('hp', e.target.value)}
         fieldName="hp"
         min={0}
-        max={9999}
+        max={999999}
         className="border-red-500 focus:ring-red-500"
       />
       <ValidatedInput
@@ -367,7 +367,7 @@ function CharacterSheet({ onFixAttributes }) {
         onChange={(e) => updateCharacterField('aura', e.target.value)}
         fieldName="aura"
         min={0}
-        max={9999}
+        max={999999}
         className="border-white focus:ring-gray-400"
       />
       
@@ -380,7 +380,7 @@ function CharacterSheet({ onFixAttributes }) {
         onChange={(e) => updateCharacterField('mana', e.target.value)}
         fieldName="mana"
         min={0}
-        max={9999}
+        max={999999}
         className="border-blue-600 focus:ring-blue-600"
       />
       <ValidatedInput
@@ -390,7 +390,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={en}
         onChange={(e) => updateCharacterField('en', e.target.value)}
         min={0}
-        max={9999}
+        max={999999}
         className="border-red-800 focus:ring-red-800"
       />
       
@@ -402,7 +402,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={ep}
         onChange={(e) => updateCharacterField('ep', e.target.value)}
         min={0}
-        max={9999}
+        max={999999}
         className="border-green-500 focus:ring-green-500"
       />
       <ValidatedInput
@@ -412,7 +412,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={ea}
         onChange={(e) => updateCharacterField('ea', e.target.value)}
         min={0}
-        max={9999}
+        max={999999}
         className="border-yellow-500 focus:ring-yellow-500"
       />
       <ValidatedInput
@@ -422,7 +422,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={er}
         onChange={(e) => updateCharacterField('er', e.target.value)}
         min={0}
-        max={9999}
+        max={999999}
         className="border-sky-500 focus:ring-sky-500"
       />
       
@@ -454,7 +454,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={vigor}
         onChange={(e) => updateCharacterField('vigor', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -464,7 +464,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={stealth}
         onChange={(e) => updateCharacterField('stealth', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -474,7 +474,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={strength}
         onChange={(e) => updateCharacterField('strength', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -484,7 +484,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={adaptability}
         onChange={(e) => updateCharacterField('adaptability', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -494,7 +494,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={dexterity}
         onChange={(e) => updateCharacterField('dexterity', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -504,7 +504,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={perception}
         onChange={(e) => updateCharacterField('perception', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -514,7 +514,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={agility}
         onChange={(e) => updateCharacterField('agility', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -524,7 +524,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={intuition}
         onChange={(e) => updateCharacterField('intuition', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -534,7 +534,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={rarity}
         onChange={(e) => updateCharacterField('rarity', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -544,7 +544,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={athletics}
         onChange={(e) => updateCharacterField('athletics', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -554,7 +554,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={animalHandling}
         onChange={(e) => updateCharacterField('animalHandling', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
       <ValidatedInput
@@ -564,7 +564,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={initiative}
         onChange={(e) => updateCharacterField('initiative', e.target.value)}
         min={0}
-        max={999}
+        max={99999}
         className="border-pink-500 focus:ring-pink-500"
       />
     </div>
@@ -639,7 +639,7 @@ function CharacterSheet({ onFixAttributes }) {
 
       {/* Seção de Status Principais */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700">
-        <h3 className="text-lg font-semibold font-medieval-title text-amber-100 mb-4 uppercase tracking-wider">
+        <h3 className="text-lg font-semibold font-storm-gust text-amber-100 mb-4 uppercase tracking-wider">
           Status Principais
         </h3>
         {statusFields}
@@ -655,7 +655,7 @@ function CharacterSheet({ onFixAttributes }) {
 
       {/* Seção Balança da Vida */}
       <section className="mb-8 p-4 bg-gray-800/60 rounded-md border border-gray-700 text-center">
-        <h4 className="text-2xl font-medium font-medieval-title text-amber-300 mb-4 uppercase tracking-wider">
+        <h4 className="text-2xl font-medium font-storm-gust text-amber-300 mb-4 uppercase tracking-wider">
           BALANÇA DA VIDA
         </h4>
         <div className="flex justify-center items-center space-x-8">

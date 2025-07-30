@@ -6,6 +6,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'storm-gust': ['Storm Gust', 'Cinzel', 'serif'],
+        'medieval': ['Cinzel', 'serif'],
+        'medieval-title': ['Uncial Antiqua', 'cursive'],
+      },
       keyframes: {
         shake: {
           '0%, 100%': { transform: 'translateX(0)' },

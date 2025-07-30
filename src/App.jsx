@@ -153,7 +153,7 @@ function AppContent() {
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-bold font-medieval-title bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600 bg-clip-text text-transparent drop-shadow-lg">
+                <h1 className="text-2xl font-bold font-storm-gust bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600 bg-clip-text text-transparent drop-shadow-lg">
                   FICHA RPG
                 </h1>
                 <p className="text-sm text-amber-300/80 font-medieval">System created solely for the CICLO DE DOZE LUAS</p>
@@ -197,26 +197,36 @@ function AppContent() {
           <aside className="col-span-12 lg:col-span-2">
             <div className={`${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
               <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
-                <h3 className={`font-semibold ${theme.classes.text} flex items-center gap-2`}>
-                  <Gamepad2 size={16} className={theme.classes.accent} />
+                <h3 className={`font-semibold font-medieval text-amber-100 flex items-center gap-2`}>
+                  {/* GIF Animado SVG */}
+                  <svg width="20" height="20" viewBox="0 0 24 24" className="text-amber-400">
+                    <circle cx="12" cy="12" r="3" fill="currentColor">
+                      <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
+                      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5">
+                      <animate attributeName="stroke-dasharray" values="0,50;25,25;50,0" dur="3s" repeatCount="indefinite" />
+                    </circle>
+                  </svg>
+                  <Gamepad2 size={16} className="text-amber-400" />
                   Fixed Stats
                 </h3>
                 {computed.hasFixedAttributes && (
-                  <div className={`text-xs ${theme.classes.textSecondary} mt-1`}>
+                  <div className={`text-xs text-amber-400/60 mt-1 font-medieval`}>
                     {fixedAttributes.length} atributo{fixedAttributes.length !== 1 ? 's' : ''}
                   </div>
                 )}
               </div>
               <div className="p-4 space-y-2 max-h-96 overflow-y-auto">
                 {!computed.hasFixedAttributes ? (
-                  <p className={`text-sm ${theme.classes.textSecondary} italic`}>No fixed attributes</p>
+                  <p className={`text-sm text-amber-400/60 italic font-medieval`}>No fixed attributes</p>
                 ) : (
                   fixedAttributes.map((attr, index) => (
-                    <div key={`${attr.name}-${index}`} className={`p-2 ${theme.classes.input} rounded border ${theme.classes.cardBorder} hover:border-gray-600 transition-colors`}>
-                      <div className={`text-xs ${theme.classes.textSecondary} uppercase tracking-wider`}>
+                    <div key={`${attr.name}-${index}`} className={`p-2 ${theme.classes.input} rounded border ${theme.classes.cardBorder} hover:border-amber-600 transition-colors`}>
+                      <div className={`text-xs text-amber-400/60 uppercase tracking-wider font-medieval`}>
                         {attr.name}
                       </div>
-                      <div className={`text-lg font-bold ${attr.color || theme.classes.accent}`}>
+                      <div className={`text-lg font-bold font-medieval ${attr.color || 'text-amber-400'}`}>
                         {attr.value}
                       </div>
                     </div>

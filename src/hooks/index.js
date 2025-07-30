@@ -83,8 +83,8 @@ export const useValidation = () => {
       case 'mana':
       case 'aura':
         const numValue = Number(stringValue);
-        if (stringValue !== '' && (isNaN(numValue) || numValue < 0 || numValue > 9999)) {
-          return { isValid: false, error: 'Valor deve ser entre 0 e 9999' };
+        if (stringValue !== '' && (isNaN(numValue) || numValue < 0 || numValue > 999999)) {
+          return { isValid: false, error: 'Valor deve ser entre 0 e 999999' };
         }
         break;
       

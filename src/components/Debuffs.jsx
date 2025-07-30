@@ -10,16 +10,16 @@ function Debuffs() {
   
   const [newDebuff, setNewDebuff] = useState({ name: '', turns: 1 });
 
-  // Cores aleatórias para os debuffs
+  // Cores medievais/âmbar para os debuffs
   const debuffColors = [
-    { bg: 'bg-red-600', border: 'border-red-500', text: 'text-red-400' },
+    { bg: 'bg-amber-600', border: 'border-amber-500', text: 'text-amber-400' },
     { bg: 'bg-orange-600', border: 'border-orange-500', text: 'text-orange-400' },
     { bg: 'bg-yellow-600', border: 'border-yellow-500', text: 'text-yellow-400' },
-    { bg: 'bg-purple-600', border: 'border-purple-500', text: 'text-purple-400' },
-    { bg: 'bg-pink-600', border: 'border-pink-500', text: 'text-pink-400' },
-    { bg: 'bg-indigo-600', border: 'border-indigo-500', text: 'text-indigo-400' },
+    { bg: 'bg-red-600', border: 'border-red-500', text: 'text-red-400' },
     { bg: 'bg-rose-600', border: 'border-rose-500', text: 'text-rose-400' },
-    { bg: 'bg-violet-600', border: 'border-violet-500', text: 'text-violet-400' }
+    { bg: 'bg-stone-600', border: 'border-stone-500', text: 'text-stone-400' },
+    { bg: 'bg-neutral-600', border: 'border-neutral-500', text: 'text-neutral-400' },
+    { bg: 'bg-zinc-600', border: 'border-zinc-500', text: 'text-zinc-400' }
   ];
 
   const getRandomColor = () => {
@@ -71,8 +71,18 @@ function Debuffs() {
     <div className={`debuffs-container ${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
       {/* Header */}
       <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
-        <h3 className={`font-semibold ${theme.classes.text} flex items-center gap-2`}>
-          <Skull size={16} className="text-red-400" />
+        <h3 className={`font-semibold font-medieval text-amber-100 flex items-center gap-2`}>
+          {/* GIF Animado SVG */}
+          <svg width="20" height="20" viewBox="0 0 24 24" className="text-amber-400">
+            <circle cx="12" cy="12" r="3" fill="currentColor">
+              <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5">
+              <animate attributeName="stroke-dasharray" values="0,50;25,25;50,0" dur="3s" repeatCount="indefinite" />
+            </circle>
+          </svg>
+          <Skull size={16} className="text-amber-400" />
           Debuffs
         </h3>
       </div>
@@ -86,7 +96,7 @@ function Debuffs() {
               value={newDebuff.name}
               onChange={(e) => setNewDebuff({ ...newDebuff, name: e.target.value })}
               onKeyPress={(e) => e.key === 'Enter' && addDebuff()}
-              className={`w-full px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded ${theme.classes.text} focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm`}
+              className={`w-full px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded font-medieval text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm`}
               placeholder="Nome do debuff..."
             />
           </div>
@@ -96,15 +106,15 @@ function Debuffs() {
               value={newDebuff.turns}
               onChange={(e) => setNewDebuff({ ...newDebuff, turns: e.target.value })}
               min="1"
-              className={`w-20 px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded ${theme.classes.text} focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-sm`}
+              className={`w-20 px-3 py-2 ${theme.classes.input} border ${theme.classes.cardBorder} rounded font-medieval text-amber-100 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors text-sm`}
               placeholder="Turnos"
             />
             <button
               onClick={addDebuff}
-              className={`button-safe flex-1 px-4 py-2 ${theme.classes.buttonPrimary} text-white rounded transition-colors flex items-center justify-center gap-1 text-sm font-medium`}
+              className={`button-safe flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors flex items-center justify-center gap-1 text-sm font-medium font-medieval`}
             >
               <Plus size={14} />
-              Adicionar
+              Add
             </button>
           </div>
         </div>
@@ -112,7 +122,7 @@ function Debuffs() {
         {/* Debuffs List */}
         <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
           {debuffs.length === 0 ? (
-            <p className={`${theme.classes.textSecondary} text-sm italic text-center py-4`}>
+            <p className={`text-amber-400/60 text-sm italic text-center py-4 font-medieval`}>
               Nenhum debuff ativo
             </p>
           ) : (
@@ -124,10 +134,10 @@ function Debuffs() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0 pr-2">
-                    <div className={`font-medium ${debuff.color.text} text-sm break-words`}>
+                    <div className={`font-medium font-medieval ${debuff.color.text} text-sm break-words`}>
                       {debuff.name}
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+                    <div className="flex items-center gap-1 text-xs text-amber-400/60 mt-1 font-medieval">
                       <Clock size={10} />
                       <span>{debuff.turns} turnos restantes</span>
                     </div>
@@ -147,7 +157,7 @@ function Debuffs() {
                     </button>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 mt-2 italic">
+                <div className="text-xs text-amber-400/50 mt-2 italic font-medieval">
                   Clique para reduzir turno
                 </div>
               </div>

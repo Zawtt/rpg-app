@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Plus, Trash2, Edit3, Clock, Zap, Shield, Sword, Sparkles, Save, X, Eye, Book } from 'lucide-react';
+import { Plus, Trash2, Edit3, Clock, Zap, Shield, Sword, Sparkles, Save, X, Eye, Book, Settings } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
 import { useTheme } from './ThemeProvider';
 
@@ -10,6 +10,7 @@ function AbilitiesAndSpells() {
   
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedSkill, setSelectedSkill] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const modalRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -196,7 +197,7 @@ function AbilitiesAndSpells() {
   const getRandomIcon = useCallback(() => {
     const icons = [Zap, Shield, Sword, Sparkles];
     const Icon = icons[Math.floor(Math.random() * icons.length)];
-    return <Icon size={20} />;
+    return <Icon size={16} />;
   }, []);
 
   return (
@@ -204,10 +205,10 @@ function AbilitiesAndSpells() {
       <div className="abilities-container bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-800">
-          <h3 className="text-2xl font-medium font-medieval-title text-amber-100 flex items-center gap-3">
-              <Sparkles size={24} className="text-amber-400" />
-              HABILIDADES
-            </h3>
+          <h3 className="text-2xl font-medium font-storm-gust text-amber-100 flex items-center gap-3">
+            <Sparkles size={24} className="text-amber-400" />
+            HABILIDADES
+          </h3>
           <div className="w-20 h-0.5 bg-purple-500 mt-2"></div>
         </div>
 
@@ -221,8 +222,8 @@ function AbilitiesAndSpells() {
                 <Plus size={20} className="text-gray-400" />
               )}
               <h4 className="text-lg font-medium font-medieval text-amber-100">
-                  {editingIndex !== null ? 'EDITAR HABILIDADE' : 'NOVA HABILIDADE'}
-                </h4>
+                {editingIndex !== null ? 'EDITAR HABILIDADE' : 'NOVA HABILIDADE'}
+              </h4>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -311,14 +312,28 @@ function AbilitiesAndSpells() {
             </div>
           </div>
 
-          {/* Abilities Grid */}
-          <div className="abilities-grid">
+          {/* Abilities List */}
+          <div className="abilities-list">
             <div className="flex justify-between items-center mb-4">
               <h4 className="text-lg font-medium font-medieval text-amber-100">
                 REGISTRO DE HABILIDADES
               </h4>
-              <div className="text-sm text-gray-400">
-                {abilities.length} habilidade{abilities.length !== 1 ? 's' : ''} registrada{abilities.length !== 1 ? 's' : ''}
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-400">
+                  {abilities.length} habilidade{abilities.length !== 1 ? 's' : ''}
+                </div>
+                <button
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  className={`p-2 rounded-lg transition-all flex items-center gap-2 text-sm ${
+                    isEditMode 
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-gray-300'
+                  }`}
+                  title={isEditMode ? 'Sair do modo edição' : 'Entrar no modo edição'}
+                >
+                  <Settings size={16} />
+                  {isEditMode ? 'Sair' : 'Editar'}
+                </button>
               </div>
             </div>
             
@@ -329,95 +344,111 @@ function AbilitiesAndSpells() {
                 <p className="text-gray-600 text-sm">Crie sua primeira habilidade de combate</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 {abilities.map((skill, index) => (
                   <div
                     key={skill.id || `skill-${index}`}
-                    className={`group relative bg-gray-800 border rounded-lg transition-all duration-300 overflow-hidden ${
+                    className={`group relative bg-gray-800/60 border rounded-lg transition-all duration-300 overflow-hidden ${
                       skill.isOnCooldown 
-                        ? 'border-gray-700 bg-gray-850 opacity-60' 
-                        : 'border-gray-700 hover:border-purple-500 hover:bg-gray-750 cursor-pointer'
+                        ? 'border-gray-700 bg-gray-850/60 opacity-70' 
+                        : 'border-gray-700 hover:border-purple-500/50 hover:bg-gray-800/80 cursor-pointer'
                     }`}
                     onClick={(e) => {
-                      // Prevenir clique se for nos botões de ação
-                      if (e.target.closest('.action-buttons')) {
+                      // Prevenir clique se for nos botões de ação ou se estiver em modo de edição
+                      if (e.target.closest('.action-buttons') || isEditMode) {
                         return;
                       }
                       skill.isOnCooldown ? decreaseCooldown(index) : useSkill(index);
                     }}
                   >
-                    {/* Cooldown Overlay */}
+                    {/* Cooldown Overlay para skills em cooldown */}
                     {skill.isOnCooldown && (
-                      <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-900/90 rounded-lg backdrop-blur-sm">
-                        <div className="text-center">
-                          <div className="text-5xl font-bold text-red-400 mb-2">
+                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10">
+                        <div className="bg-red-500/20 border border-red-500/30 rounded-lg px-3 py-1 backdrop-blur-sm">
+                          <div className="text-lg font-bold text-red-400 text-center">
                             {skill.currentCooldown || 0}
                           </div>
-                          <div className="text-xs text-gray-400 uppercase tracking-wider">
-                            RECARGA
-                          </div>
-                          <div className="text-xs text-gray-500 mt-1">
-                            Clique para reduzir
+                          <div className="text-xs text-red-300 text-center">
+                            turnos
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div className="p-5">
-                      <div className="relative mb-3">
-                        <div className="flex items-start gap-3 pr-24">
-                          <div className="text-purple-400 flex-shrink-0 mt-1">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="text-purple-400 flex-shrink-0">
                             {getRandomIcon()}
                           </div>
-                          <h3 className="text-lg font-medium font-medieval text-amber-100 break-words leading-tight flex-1">
-                            {skill.name}
-                          </h3>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-base font-medium font-storm-gust text-amber-100 truncate">
+                              {skill.name}
+                            </h3>
+                            <div className="flex items-center gap-4 mt-1">
+                              <span className="text-sm text-gray-300">
+                                {skill.cost}
+                              </span>
+                              <span className="text-sm text-gray-400 flex items-center gap-1">
+                                <Clock size={12} />
+                                {skill.maxCooldown || skill.cooldown || 0}T
+                              </span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="action-buttons absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-20">
+                        
+                        {/* Botões de ação - só aparecem no modo edição */}
+                        {isEditMode && (
+                          <div className="action-buttons flex gap-2 ml-4">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(index);
+                              }}
+                              className="bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 hover:text-blue-200 p-2 rounded-md transition-all"
+                              title="Editar habilidade"
+                            >
+                              <Edit3 size={14} />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm(`Deseja realmente deletar "${skill.name}"?`)) {
+                                  handleDelete(index);
+                                }
+                              }}
+                              className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 hover:text-red-200 p-2 rounded-md transition-all"
+                              title="Deletar habilidade"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* Botão de detalhes - só aparece quando não está em modo edição */}
+                        {!isEditMode && (
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(index);
-                            }}
-                            className="bg-blue-500/30 hover:bg-blue-500/50 border border-blue-500/50 hover:border-blue-500/70 text-blue-200 hover:text-white p-2 rounded-md transition-all shadow-lg backdrop-blur-sm"
-                            title="Editar habilidade"
+                            onClick={(e) => openSkillModal(index, e)}
+                            className="text-amber-400/60 hover:text-amber-400 transition-colors p-2"
+                            title="Ver detalhes"
                           >
-                            <Edit3 size={14} />
+                            <Eye size={16} />
                           </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (confirm(`Deseja realmente deletar "${skill.name}"?`)) {
-                                handleDelete(index);
-                              }
-                            }}
-                            className="bg-red-500/30 hover:bg-red-500/50 border border-red-500/50 hover:border-red-500/70 text-red-200 hover:text-white p-2 rounded-md transition-all shadow-lg backdrop-blur-sm"
-                            title="Deletar habilidade"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      <div className="flex gap-3 mb-4 flex-wrap">
-                        <span className="inline-flex items-center px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
-                           {skill.cost}
-                        </span>
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700/80 text-gray-300 rounded-md text-sm font-medium border border-gray-600">
-                          <Clock size={14} />
-                          {skill.maxCooldown || skill.cooldown || 0}T
-                        </span>
+                        )}
                       </div>
 
-                      {!skill.isOnCooldown && (
-                        <div className="mt-4 pt-3 border-t border-gray-700/50 text-xs font-medieval text-amber-400 italic">
-                           Clique para usar • 
-                          <button 
-                            onClick={(e) => openSkillModal(index, e)}
-                            className="ml-1 text-amber-400 hover:text-amber-300 underline transition-colors"
-                          >
-                            Ver detalhes
-                          </button>
+                      {/* Indicador de status na parte inferior */}
+                      {!isEditMode && (
+                        <div className="mt-3 pt-2 border-t border-gray-700/50 text-xs">
+                          {skill.isOnCooldown ? (
+                            <span className="text-red-400 font-medium">
+                              Clique para reduzir cooldown
+                            </span>
+                          ) : (
+                            <span className="text-green-400 font-medium">
+                              Clique para usar
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -444,7 +475,7 @@ function AbilitiesAndSpells() {
                     <Book size={28} className="text-purple-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold font-medieval-title text-amber-100">
+                    <h2 className="text-2xl font-bold font-storm-gust text-amber-100">
                       {abilities[selectedSkill]?.name}
                     </h2>
                     <p className="text-amber-400 text-sm font-medieval">Detalhes da Habilidade</p>
@@ -553,6 +584,21 @@ function AbilitiesAndSpells() {
                   >
                     <Edit3 size={16} />
                     Editar
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      const index = selectedSkill;
+                      if (confirm(`Deseja realmente deletar "${abilities[index]?.name}"?`)) {
+                        setSelectedSkill(null);
+                        handleDelete(index);
+                      }
+                    }}
+                    className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    title="Excluir"
+                  >
+                    <Trash2 size={16} />
+                    Excluir
                   </button>
                 </div>
               </div>

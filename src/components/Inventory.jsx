@@ -123,7 +123,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
             <div className="flex items-center gap-3">
               <Package size={24} className="text-amber-400" />
               <div>
-                <h3 className="text-2xl font-medieval-title text-amber-100">INVENTORY</h3>
+                <h3 className="text-2xl font-storm-gust text-amber-100">INVENTORY</h3>
                 <div className="w-20 h-0.5 bg-amber-500 mt-1"></div>
               </div>
             </div>
@@ -143,7 +143,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
               ) : (
                 <Plus size={20} className="text-amber-400" />
               )}
-              <h4 className="text-lg font-medieval-title text-amber-100">
+              <h4 className="text-lg font-storm-gust text-amber-100">
                 {editingIndex !== null ? 'EDITAR ITEM' : 'ADICIONAR ITEM'}
               </h4>
             </div>
@@ -346,7 +346,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
                     <Package size={28} className="text-amber-400" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-medieval-title font-bold text-amber-100">
+                    <h2 className="text-2xl font-storm-gust font-bold text-amber-100">
                       {inventoryItems[selectedItem]?.name}
                     </h2>
                     <p className="text-amber-400 font-medieval text-sm">Detalhes do Item</p>
@@ -387,7 +387,7 @@ function Inventory({ inventoryItems, setInventoryItems }) {
 
                 {/* Descrição */}
                 <div className="bg-gradient-to-br from-gray-800/50 to-gray-800/30 rounded-lg p-6 border border-gray-700 border-l-4 border-l-amber-500">
-                  <h3 className="text-lg font-medieval-title text-amber-100 mb-4 uppercase tracking-wider">
+                  <h3 className="text-lg font-storm-gust text-amber-100 mb-4 uppercase tracking-wider">
                      Descrição
                   </h3>
                   <div className="prose prose-invert max-w-none">

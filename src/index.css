@@ -1,8 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Uncial+Antiqua&display=swap');
+@import './assets/fonts/storm-gust.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Import Tailwind base styles */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Medieval Font Classes */
 .font-medieval {
@@ -15,7 +17,7 @@
 
 /* Enhanced Theme Colors */
 :root {
-  --medieval-gold: #d4af37;
+  --medieval-gold: #ffffff;
   --medieval-bronze: #cd7f32;
   --medieval-crimson: #dc143c;
   --medieval-forest: #228b22;

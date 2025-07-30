@@ -37,7 +37,7 @@ function NotesTab() {
 
   return (
     <div className={`p-4 ${theme.classes.card} rounded-md ${theme.classes.cardBorder}`}>
-      <h4 className={`text-2xl font-medieval-title font-medium text-amber-100 mb-4`}>Minhas Anotações</h4>
+      <h4 className={`text-2xl font-storm-gust font-medium text-amber-100 mb-4`}>Minhas Anotações</h4>
       <textarea
         className={`w-full p-2 font-medieval bg-gray-800/80 border border-amber-600/50 text-amber-100 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 placeholder-amber-400/60 resize-y break-words word-break-break-word overflow-wrap-break-word hyphens-auto`}
         style={{whiteSpace: 'pre-line', wordBreak: 'break-word', overflowWrap: 'break-word'}}
