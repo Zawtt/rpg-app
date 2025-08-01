@@ -1,11 +1,9 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { Dices, History, Play, AlertCircle, Trash2 } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
 import { useTheme } from './ThemeProvider';
 import { useValidation, useDebounce, useAccessibility, useSounds } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
-
-
 
 // ✅ CORREÇÃO: Parser seguro para expressões matemáticas
 const safeEvaluateExpression = (expression) => {
@@ -106,8 +104,16 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const debouncedExpression = useDebounce(expression, 500);
   const theme = useTheme();
 
+  // Cleanup quando componente for desmontado
+  useEffect(() => {
+    return () => {
+      // Limpar qualquer timer pendente quando o componente for desmontado
+      rollingRef.current = false;
+    };
+  }, []);
+
   // Validação em tempo real da expressão
-  React.useEffect(() => {
+  useEffect(() => {
     if (debouncedExpression.trim()) {
       const validation = validateDiceExpression(debouncedExpression);
       setValidationError(validation.isValid ? '' : validation.error);
@@ -171,9 +177,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     let errorOccurred = false;
 
     try {
-      const diceRegex = /(\d*)d(\d+)/g;
+      // ✅ CORREÇÃO: Regex única para dados
+      const diceRegex = /(\d*)d(\d+)/gi; // Com flag 'i' para case-insensitive
       let diceRollsDetails = [];
-
+      
       // Processar dados na expressão
       const processedExpression = exprToRoll.replace(diceRegex, (match, numDiceStr, numSidesStr) => {
         const numDice = numDiceStr ? parseInt(numDiceStr, 10) : 1;
@@ -274,7 +281,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     // Aguardar o término da animação
     await new Promise(resolve => setTimeout(resolve, animationDuration));
 
-    // Finalizar animação
+    // GARANTIR LIMPEZA
     clearInterval(animationInterval);
     setShowAnimationOverlay(false);
     
@@ -301,7 +308,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       
     }, 100);
 
-  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd]);
+  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd, playDiceRollSound, playDiceLandSound]);
 
   // Handler para rolagem rápida
   const handleQuickRoll = useCallback((diceValue) => {
@@ -694,22 +701,31 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         }
 
         /* Custom scrollbar para histórico */
-        .p-4.max-h-48.overflow-y-auto::-webkit-scrollbar {
+        .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
 
-        .p-4.max-h-48.overflow-y-auto::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(55, 65, 81, 0.3);
           border-radius: 4px;
         }
 
-        .p-4.max-h-48.overflow-y-auto::-webkit-scrollbar-thumb {
+        .custom-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(251, 146, 60, 0.5);
           border-radius: 4px;
         }
 
-        .p-4.max-h-48.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: rgba(251, 146, 60, 0.7);
+        }
+
+        /* Animação para dados */
+        .dice-animation {
+          animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        .dice-result {
+          color: var(--theme-dice-color, #f59e0b);
         }
       `}</style>
     </div>

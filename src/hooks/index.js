@@ -35,13 +35,10 @@ export const useValidation = () => {
     }
 
     // Verificar caracteres permitidos
+    // Remover comentário desnecessário e manter regex correta
     const allowedPattern = /^[\d\s+\-*/dD().,]+$/;
-    if (!allowedPattern.test(trimmed)) {
-      return { isValid: false, error: 'Caracteres inválidos na expressão' };
-    }
-
-    // Verificar estrutura básica de dados
     const dicePattern = /(\d*)d(\d+)/gi;
+    
     const matches = trimmed.match(dicePattern);
     
     if (matches) {

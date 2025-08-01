@@ -188,10 +188,9 @@ function AppContent() {
       </header>
 
       {/* Main Content */}
-      <main className={`relative z-10 max-w-7xl mx-auto px-6 py-8 transition-transform duration-500 ${
-        ui.isShaking ? 'animate-shake' : ''
-      } main-content`}>
-        <div className="grid grid-cols-12 gap-6">
+      // Atualizar o container principal para melhor espaçamento:
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8 transition-transform duration-500 smooth-transition">
+      <div className="grid grid-cols-12 gap-8"> {/* Aumentar gap de 6 para 8 */}
           
           {/* Fixed Attributes Sidebar */}
           <aside className="col-span-12 lg:col-span-2">
@@ -236,7 +235,7 @@ function AppContent() {
             </div>
             
             {/* Debuffs Section */}
-            <div className="mt-6 sticky top-6">
+            <div className="mt-6 sticky top-[28rem]"> {/* Alterado de top-6 para top-[28rem] */}
               {memoizedDebuffs}
             </div>
           </aside>

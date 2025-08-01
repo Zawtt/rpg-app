@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // ✅ ADICIONADO useEffect aqui
 import { Palette, Check, X, Sparkles } from 'lucide-react';
 import { themes, useTheme } from './ThemeProvider';
 import { useAppContext } from '../contexts/AppContext';
@@ -26,18 +26,20 @@ const ThemeSelector = () => {
   };
 
   // Adicionar suporte para tecla Escape
-  React.useEffect(() => {
+  useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === 'Escape' && isOpen) {
         setIsOpen(false);
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
-  }, [isOpen]);
+    document.addEventListener('keydown', handleEscape);
+    
+    // ADICIONAR CLEANUP
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen]); // ✅ CORRIGIDO: dependência deve ser isOpen, não setIsOpen
 
   // Cores de preview para cada tema
   const themePreviewColors = {

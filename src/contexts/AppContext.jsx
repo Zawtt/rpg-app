@@ -15,7 +15,10 @@ const storageUtils = {
         version: '1.0'
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-      console.log('💾 Dados salvos automaticamente');
+      // Remover ou tornar condicional
+      if (process.env.NODE_ENV === 'development') {
+        console.log('💾 Dados salvos automaticamente');
+      }
       return true;
     } catch (error) {
       console.error('Erro ao salvar:', error);
