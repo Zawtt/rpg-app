@@ -39,21 +39,21 @@ const themes = {
   },
   
   cyberpunk: {
-    name: 'Cyberpunk 2077',
-    description: 'Futuro neon vibrante',
+    name: 'Gaby Theme',
+    description: 'Pink Non',
     classes: {
-      background: 'bg-gradient-to-br from-gray-900 via-purple-900/20 to-pink-900/20',
+      background: 'bg-gradient-to-br from-black via-black to-black',
       card: 'bg-gray-900/80 backdrop-blur-lg border-l-4 border-r-4',
-      cardBorder: 'border-cyan-500/50',
-      text: 'text-cyan-100',
-      textSecondary: 'text-cyan-400/70',
-      accent: 'text-cyan-400',
-      button: 'bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-700 hover:to-purple-700',
-      input: 'bg-gray-900/80 border-cyan-500/30',
+      cardBorder: 'border-pink-500/50',
+      text: 'text-red-100',
+      textSecondary: 'text-white-400',
+      accent: 'text-red-400',
+      button: 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700',
+      input: 'bg-gray-900/80 border-pink-500/30',
       overlay: 'bg-black/80 backdrop-blur-md'
     },
     effects: {
-      glow1: 'bg-cyan-500/20 shadow-cyan-500/30 animate-pulse',
+      glow1: 'bg-pink-500/20 shadow-cyan-500/30 animate-pulse',
       glow2: 'bg-purple-500/20 shadow-purple-500/30 animate-pulse',
       glow3: 'bg-pink-500/20 shadow-pink-500/30 animate-pulse'
     },
@@ -68,7 +68,7 @@ const themes = {
     },
     dice: {
       color: 'text-cyan-400',
-      shadow: 'shadow-cyan-500/50',
+      shadow: 'shadow-pink-500/50',
       animation: 'animate-pulse'
     }
   },
