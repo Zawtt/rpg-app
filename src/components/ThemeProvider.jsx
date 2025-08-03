@@ -40,13 +40,13 @@ const themes = {
   
   cyberpunk: {
     name: 'Gaby Theme',
-    description: 'Pink Non',
+    description: 'Pink Neon',
     classes: {
       background: 'bg-gradient-to-br from-black via-black to-black',
-      card: 'bg-gray-900/80 backdrop-blur-lg border-l-4 border-r-4',
+      card: 'bg-gray-900 backdrop-blur-lg border-l-4 border-r-5',
       cardBorder: 'border-pink-500/50',
       text: 'text-red-100',
-      textSecondary: 'text-white-400',
+      textSecondary: 'text-white-100',
       accent: 'text-red-400',
       button: 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700',
       input: 'bg-gray-900/80 border-pink-500/30',
@@ -67,46 +67,45 @@ const themes = {
       active: 'active:scale-95'
     },
     dice: {
-      color: 'text-cyan-400',
+      color: 'text-pink-400',
       shadow: 'shadow-pink-500/50',
       animation: 'animate-pulse'
     }
   },
-  
   medieval: {
-    name: 'Medieval Fantasy',
-    description: 'Era dourada medieval',
-    classes: {
-      background: 'bg-[url("/parchment-bg.jpg")] bg-cover bg-fixed bg-amber-950',
-      card: 'bg-amber-950/80 backdrop-blur-sm border-double border-4',
-      cardBorder: 'border-amber-700/80',
-      text: 'text-amber-100',
-      textSecondary: 'text-amber-200/90',
-      accent: 'text-yellow-600',
-      button: 'bg-gradient-to-r from-amber-700 to-yellow-600 hover:from-amber-800 hover:to-yellow-700',
-      input: 'bg-amber-950/90 border-amber-700/80',
-      overlay: 'bg-amber-950/90'
-    },
-    effects: {
-      glow1: 'bg-amber-500/10 shadow-amber-500/20',
-      glow2: 'bg-yellow-500/10 shadow-yellow-500/20',
-      glow3: 'bg-orange-500/10 shadow-orange-500/20'
-    },
-    fonts: {
-      heading: 'font-serif',
-      body: 'font-serif'
-    },
-    animations: {
-      transition: 'transition-all duration-500',
-      hover: 'hover:scale-105 hover:shadow-xl',
-      active: 'active:scale-95'
-    },
-    dice: {
-      color: 'text-amber-500',
-      shadow: 'shadow-amber-500/50',
-      animation: 'animate-bounce'
-    }
+  name: 'Guizin Theme',
+  description: 'Era dourada',
+  classes: {
+    background: 'bg-gradient-to-br from-black via-black to-black',
+    card: 'bg-gray-950 backdrop-blur-sm border-double border-4',
+    cardBorder: 'border-amber-700/80',
+    text: 'text-amber-100',
+    textSecondary: 'text-amber-200/90',
+    accent: 'text-yellow-600',
+    button: 'bg-gradient-to-r from-amber-700 to-yellow-600 hover:from-amber-800 hover:to-yellow-700',
+    input: 'bg-gray-900 border-gray-700/80',
+    overlay: 'bg-gray-900'
   },
+  effects: {
+    glow1: 'bg-amber-500/10 shadow-amber-500/20',
+    glow2: 'bg-yellow-500/10 shadow-yellow-500/20',
+    glow3: 'bg-orange-500/10 shadow-orange-500/20'
+  },
+  fonts: {
+    heading: 'font-serif',
+    body: 'font-serif'
+  },
+  animations: {
+    transition: 'transition-all duration-500',
+    hover: 'hover:scale-105 hover:shadow-xl',
+    active: 'active:scale-95'
+  },
+  dice: {
+    color: 'text-amber-500',
+    shadow: 'shadow-amber-500/50',
+    animation: 'animate-bounce'
+  }
+},
   
   nature: {
     name: 'Forest Guardian',
