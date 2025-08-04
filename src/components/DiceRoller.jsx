@@ -124,14 +124,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
   // ✅ CORREÇÃO: Array estático não precisa de useMemo
   const quickRolls = [
-    { label: 'd4', value: '1d4', description: 'Dado de 4 faces' },
-    { label: 'd6', value: '1d6', description: 'Dado de 6 faces' },
-    { label: 'd8', value: '1d8', description: 'Dado de 8 faces' },
-    { label: 'd10', value: '1d10', description: 'Dado de 10 faces' },
-    { label: 'd12', value: '1d12', description: 'Dado de 12 faces' },
-    { label: 'd20', value: '1d20', description: 'Dado de 20 faces' },
-    { label: '2d6', value: '2d6', description: '2 dados de 6 faces' },
-    { label: '3d6', value: '3d6', description: '3 dados de 6 faces' }
+    { label: '1d2', value: '1d2', description: 'Sim ou nao' },
+    { label: '1d20', value: '1d20', description: '1d20 kkk' },
+    { label: '1d50', value: '1d50', description: 'vai se fuder' },
+    { label: '1d100', value: '1d100', description: 'boa sorte filhote' },
   ];
 
   // Função para determinar cor do resultado
@@ -357,8 +353,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         {/* Expression Input */}
         <div>
           <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
-            Expressão de Dados
-            <span className={`text-amber-300/80 normal-case ml-2`}>(Ex: 2d6+3, 1d20+5)</span>
+            Rolagens de Dados
+            <span className={`text-amber-300/80 normal-case ml-2`}></span>
           </label>
           <div className="relative">
             <input
@@ -375,7 +371,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 }
                 ${ui.loading.rolling ? 'opacity-50 cursor-not-allowed' : ''}
               `}
-              placeholder="2d6+3, 1d20, 4d8+2..."
+              placeholder=">"
               maxLength={100}
               aria-invalid={validationError ? 'true' : 'false'}
               aria-describedby={validationError ? 'expression-error' : 'expression-help'}
@@ -399,8 +395,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           </div>
           
           {/* Mensagem de ajuda */}
-          <div id="expression-help" className={`text-xs font-medieval text-amber-300/80 mt-1`}>
-            {expression.length}/100 caracteres • Pressione Enter ou clique em ▶ para rolar
+          <div id="expression-help" className={`text-xs font-medieval text-amber-300/80 mt-1`}> 
           </div>
           
           {/* Erro de validação */}
@@ -419,7 +414,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         {/* Quick Roll Buttons */}
         <div>
           <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
-            Rolagens Rápidas
           </label>
           <div className="grid grid-cols-4 gap-2">
             {quickRolls.map((dice) => (
@@ -460,9 +454,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           `}
           aria-label="Rolar dados com a expressão atual"
         >
-          <div className="flex items-center justify-center gap-2">
-            <Dices size={20} />
-            ROLL DICE
+          <div className="flex items-center justify-center gap">
+            <Dices size={30} />
           </div>
         </LoadingButton>
 
@@ -492,7 +485,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           )}
           
           <div className={`text-xs font-medieval text-amber-400 uppercase tracking-wider mb-2 relative z-10`}>
-            Resultado
+            🔻
           </div>
           <div 
             className={`dice-result text-5xl font-extrabold transition-all duration-500 relative z-10 ${showResultGlow ? 'dice-animation' : ''}`}
@@ -503,12 +496,12 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             {result !== null ? result : '?'}
           </div>
           {result !== null && typeof result === 'number' && (
-            <div className={`text-sm font-medieval text-amber-300/80 mt-3 relative z-10 font-medium`}>
-              {result === 1 && '💀 Falha Crítica!'}
-              {result === 20 && '🎉 Sucesso Crítico!'}
-              {result >= 15 && result < 20 && ' Excelente!'}
-              {result >= 10 && result < 15 && ' Bom resultado'}
-              {result < 10 && result > 1 && ' Resultado médio'}
+            <div className={`text-sm font-medieval text-amber-300 mt-1 relative z-10 font-medium`}>
+              {result === 1 && 'nah bro💀'}
+              {result === 20 && '🎉CRITICO🎉'}
+              {result >= 15 && result < 20 && 'Boa!!!'}
+              {result >= 10 && result < 15 && 'Boa'}
+              {result < 10 && result > 1 && 'bruh'}
             </div>
           )}
         </div>
@@ -519,7 +512,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             <div className="flex items-center gap-2">
               <History size={16} className={theme.classes.textSecondary} />
               <h4 className={`text-sm font-medium ${theme.classes.text} uppercase tracking-wider`}>
-                Histórico de Rolagens
+                <h3 className="text-2xl font-storm-gust text-white-100 flex items-center gap-3">Histórico</h3>
               </h4>
               <span className={`text-xs ${theme.classes.textSecondary}`}>
                 ({diceHistory.length}/10)
@@ -539,17 +532,17 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           <div className="p-4 max-h-48 overflow-y-auto custom-scrollbar">
             {diceHistory.length === 0 ? (
               <p className={`${theme.classes.textSecondary} italic text-sm text-center py-4`}>
-                Nenhuma rolagem realizada ainda
+                Nenhuma rolagem
               </p>
             ) : (
-              <ul className="space-y-2" role="log" aria-label="Histórico de rolagens">
+              <ul className="space-y-2" role="log" aria-label="Histórico">
                 {diceHistory.map((entry, index) => (
                   <li 
                     key={`${entry}-${index}`}
                     className={`
                       ${theme.classes.textSecondary} text-sm font-mono ${theme.classes.input} p-3 rounded border-l-2 transition-all duration-200
                       ${index === 0 
-                        ? 'border-orange-500/50 bg-orange-500/5' 
+                        ? 'border-orange-500/50 bg-white-500/5' 
                         : `${theme.classes.cardBorder} hover:border-gray-500/50`
                       }
                     `}
@@ -592,7 +585,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             
             {/* Texto de rolagem */}
             <div className="text-xl text-gray-300 animate-pulse relative z-10">
-              🎲 Rolando dados...
+              Boa sorte
             </div>
             
             {/* Indicadores de carregamento */}
@@ -674,10 +667,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         /* Pulse animation para loading states */
         @keyframes pulse-glow {
           0%, 100% {
-            box-shadow: 0 0 5px rgba(251, 146, 60, 0.5);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
           }
           50% {
-            box-shadow: 0 0 20px rgba(251, 146, 60, 0.8);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
           }
         }
 
