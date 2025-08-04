@@ -5,6 +5,182 @@ import { useTheme } from './ThemeProvider';
 import { useValidation, useDebounce, useAccessibility, useSounds } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
 
+// Implementação da classe HybridRandomGenerator
+class HybridRandomGenerator {
+  constructor() {
+    // Inicializar estado do XorShift
+    this.xorshiftState = Date.now();
+    
+    // Inicializar estado do LCG (Linear Congruential Generator)
+    this.lcgState = Math.floor(Math.random() * 2147483647);
+    
+    // Coletar entropia do sistema
+    this.systemEntropy = {
+      time: Date.now(),
+      memory: performance?.memory?.usedJSHeapSize || 0,
+      timeOrigin: performance.timeOrigin || 0,
+      devicePixelRatio: window.devicePixelRatio || 1,
+      screenSize: (window.screen.width * window.screen.height) || 1000,
+      navigatorData: JSON.stringify(navigator.userAgent).length
+    };
+    
+    // Entropia do mouse
+    this.mouseEntropy = {
+      x: 0,
+      y: 0,
+      timestamp: Date.now()
+    };
+    
+    // Configurar listener para coletar entropia do mouse
+    this.setupMouseEntropyCollection();
+  }
+  
+  // Configurar coleta de entropia do mouse
+  setupMouseEntropyCollection() {
+    const updateMouseEntropy = (e) => {
+      this.mouseEntropy = {
+        x: e.clientX,
+        y: e.clientY,
+        timestamp: Date.now()
+      };
+    };
+    
+    window.addEventListener('mousemove', updateMouseEntropy, { passive: true });
+  }
+  
+  // Implementação do algoritmo XorShift
+  nextXorShift() {
+    let x = this.xorshiftState;
+    x ^= x << 13;
+    x ^= x >> 17;
+    x ^= x << 5;
+    this.xorshiftState = x;
+    return (x < 0 ? ~x + 1 : x) % 1000000 / 1000000;
+  }
+  
+  // Implementação do algoritmo LCG
+  nextLCG() {
+    // Parâmetros do LCG (valores comuns para um bom LCG)
+    const a = 1664525;
+    const c = 1013904223;
+    const m = 2147483647; // 2^31 - 1
+    
+    this.lcgState = (a * this.lcgState + c) % m;
+    return this.lcgState / m;
+  }
+  
+  // Obter número aleatório da API Crypto
+  getCryptoRandom() {
+    if (window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] / 4294967295; // Normalizar para [0, 1)
+    }
+    return Math.random(); // Fallback para Math.random
+  }
+  
+  // Obter entropia do sistema
+  getSystemEntropy() {
+    const now = Date.now();
+    const timeDiff = now - this.systemEntropy.time;
+    
+    // Atualizar alguns valores de entropia
+    this.systemEntropy.time = now;
+    
+    // Calcular um valor baseado em vários fatores do sistema
+    const entropyValue = (
+      (now % 1000) / 1000 +
+      (timeDiff % 100) / 100 +
+      (performance.now() % 1000) / 1000 +
+      (this.systemEntropy.navigatorData % 1000) / 1000
+    ) / 4;
+    
+    return entropyValue;
+  }
+  
+  // Obter entropia do mouse
+  getMouseEntropy() {
+    const now = Date.now();
+    const timeDiff = now - this.mouseEntropy.timestamp;
+    
+    // Calcular um valor baseado na posição do mouse e tempo
+    return (
+      (this.mouseEntropy.x % 100) / 100 +
+      (this.mouseEntropy.y % 100) / 100 +
+      (timeDiff % 1000) / 1000
+    ) / 3;
+  }
+  
+  // Método principal para obter o próximo número aleatório
+  next() {
+    // Pesos para cada fonte de aleatoriedade
+    const weights = {
+      crypto: 0.35,    // API Crypto (mais forte)
+      xorshift: 0.20,  // XorShift (rápido e bom)
+      lcg: 0.10,       // LCG (complementar)
+      mathRandom: 0.10, // Math.random nativo
+      mouseEntropy: 0.10, // Entropia do mouse
+      timeEntropy: 0.05,  // Entropia do tempo
+      systemEntropy: 0.10  // Entropia do sistema
+    };
+    
+    // Obter valores de cada fonte
+    const sources = {
+      crypto: this.getCryptoRandom(),
+      xorshift: this.nextXorShift(),
+      lcg: this.nextLCG(),
+      mathRandom: Math.random(),
+      mouseEntropy: this.getMouseEntropy(),
+      timeEntropy: (Date.now() % 1000) / 1000,
+      systemEntropy: this.getSystemEntropy()
+    };
+    
+    // Combinar todas as fontes com seus pesos
+    let result = 0;
+    for (const [source, weight] of Object.entries(weights)) {
+      result += sources[source] * weight;
+    }
+    
+    // Normalizar para garantir que esteja entre [0, 1)
+    return result % 1;
+  }
+  
+  // Método para rolar um dado de N lados
+  rollDice(sides) {
+    return Math.floor(this.next() * sides) + 1;
+  }
+  
+  // Método para testar a qualidade da distribuição
+  testDistribution(sides, iterations = 10000) {
+    const counts = new Array(sides + 1).fill(0);
+    const expected = iterations / sides;
+    
+    // Realizar várias rolagens e contar ocorrências
+    for (let i = 0; i < iterations; i++) {
+      const roll = this.rollDice(sides);
+      counts[roll]++;
+    }
+    
+    // Calcular desvio da distribuição ideal
+    let totalDeviation = 0;
+    for (let i = 1; i <= sides; i++) {
+      const deviation = Math.abs(counts[i] - expected) / expected;
+      totalDeviation += deviation;
+    }
+    
+    const avgDeviation = (totalDeviation / sides) * 100;
+    const qualityScore = 100 - avgDeviation;
+    
+    return {
+      counts: counts.slice(1), // Remover o índice 0 que não usamos
+      expected,
+      avgDeviation,
+      qualityScore,
+      iterations
+    };
+  }
+}
+
 // ✅ CORREÇÃO: Parser seguro para expressões matemáticas
 const safeEvaluateExpression = (expression) => {
   try {
@@ -96,6 +272,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const rollingRef = useRef(false);
   const finalResultRef = useRef(null);
   
+  // ✅ NOVA INSTÂNCIA: Gerador híbrido
+  const hybridGenerator = useMemo(() => new HybridRandomGenerator(), []);
+  
   // Hooks
   const { ui, showToast, setLoading } = useAppContext();
   const { validateDiceExpression } = useValidation();
@@ -124,10 +303,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
   // ✅ CORREÇÃO: Array estático não precisa de useMemo
   const quickRolls = [
-    { label: '1d2', value: '1d2', description: 'Sim ou nao' },
-    { label: '1d20', value: '1d20', description: '1d20 kkk' },
-    { label: '1d50', value: '1d50', description: 'vai se fuder' },
-    { label: '1d100', value: '1d100', description: 'boa sorte filhote' },
+    { label: '1d2', value: '1d2', description: 'Sim ou não' },
+    { label: '1d20', value: '1d20', description: 'D20 clássico' },
+    { label: '1d50', value: '1d50', description: 'Desafio médio' },
+    { label: '1d100', value: '1d100', description: 'Percentual' },
   ];
 
   // Função para determinar cor do resultado
@@ -140,7 +319,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     return 'text-white';
   }, []);
 
-  // Função principal de rolagem otimizada
+  // ✅ FUNÇÃO PRINCIPAL ATUALIZADA: Usando gerador híbrido
   const rollDice = useCallback(async (exprToRoll = expression) => {
     // Verificar se já está rolando
     if (rollingRef.current) {
@@ -177,7 +356,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       const diceRegex = /(\d*)d(\d+)/gi; // Com flag 'i' para case-insensitive
       let diceRollsDetails = [];
       
-      // Processar dados na expressão
+      // ✅ MUDANÇA PRINCIPAL: Usar o gerador híbrido
       const processedExpression = exprToRoll.replace(diceRegex, (match, numDiceStr, numSidesStr) => {
         const numDice = numDiceStr ? parseInt(numDiceStr, 10) : 1;
         const numSides = parseInt(numSidesStr, 10);
@@ -189,8 +368,11 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
         let rollSum = 0;
         let rolls = [];
+        
+        // 🎲 AQUI ESTÁ A MÁGICA: Usando o gerador híbrido
         for (let i = 0; i < numDice; i++) {
-          const roll = Math.floor(Math.random() * numSides) + 1;
+          // ✨ NOVA LINHA: rollDice() do gerador híbrido
+          const roll = hybridGenerator.rollDice(numSides);
           rolls.push(roll);
           rollSum += roll;
         }
@@ -212,7 +394,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       // Preparar entrada do histórico
       calculatedHistoryEntry = exprToRoll;
       if (diceRollsDetails.length > 0) {
-        calculatedHistoryEntry += ` (${diceRollsDetails.join(' + ')})`;
+        calculatedHistoryEntry += ` (${diceRollsDetails.join(' + ')})`;  
       }
       calculatedHistoryEntry += ` = ${calculatedResult}`;
 
@@ -252,7 +434,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         const min = Math.max(1, Math.floor(calculatedResult * (1 - randomFactor * 3)));
         const max = Math.ceil(calculatedResult * (1 + randomFactor * 3));
         
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        // ✨ USANDO GERADOR HÍBRIDO PARA ANIMAÇÃO TAMBÉM
+        const animationRange = max - min + 1;
+        return min + hybridGenerator.rollDice(animationRange) - 1;
       }
       
       // Se não for um número, apenas mostrar o resultado
@@ -304,7 +488,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       
     }, 100);
 
-  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd, playDiceRollSound, playDiceLandSound]);
+  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd, playDiceRollSound, playDiceLandSound, hybridGenerator]);
 
   // Handler para rolagem rápida
   const handleQuickRoll = useCallback((diceValue) => {
@@ -338,23 +522,40 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     }
   }, [rollDice]);
 
+  // ✅ REMOVER COMPLETAMENTE ESTA FUNÇÃO COMENTADA
+  // // ✅ NOVA FUNÇÃO: Teste de qualidade do gerador
+  // // const testGeneratorQuality = useCallback(() => {
+  // //   const testResult = hybridGenerator.testDistribution(20, 5000);
+  // //   const qualityPercentage = testResult.qualityScore.toFixed(1);
+  // //   
+  // //   showToast(
+  // //     `Qualidade do gerador: ${qualityPercentage}% (Desvio médio: ${testResult.avgDeviation.toFixed(1)})`,
+  // //     testResult.qualityScore > 90 ? 'success' : testResult.qualityScore > 70 ? 'warning' : 'error'
+  // //   );
+  // //   
+  // //   console.log('Teste de Qualidade do Gerador Híbrido:', testResult);
+  // // }, [hybridGenerator, showToast]);
+
   return (
     <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl relative overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-800">
-        <h3 className="text-2xl font-storm-gust text-white flex items-center gap-3">
-          <Dices size={24} className="text-white" />
-          DICE ROLLER
-        </h3>
-        <div className="w-20 h-0.5 bg-amber-500 mt-2"></div>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-2xl font-storm-gust text-white flex items-center gap-3">
+              <Dices size={24} className="text-white" />
+              DICE ROLLER
+            </h3>
+            <div className="w-20 h-0.5 bg-amber-500 mt-2"></div>
+          </div>
+        </div>
       </div>
 
       <div className="p-6 space-y-6">
         {/* Expression Input */}
         <div>
-          <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
+          <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
             Rolagens de Dados
-            <span className={`text-amber-300/80 normal-case ml-2`}></span>
           </label>
           <div className="relative">
             <input
@@ -371,7 +572,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                 }
                 ${ui.loading.rolling ? 'opacity-50 cursor-not-allowed' : ''}
               `}
-              placeholder=">"
+              placeholder="Ex: 1d20+5, 2d6+3, 3d8"
               maxLength={100}
               aria-invalid={validationError ? 'true' : 'false'}
               aria-describedby={validationError ? 'expression-error' : 'expression-help'}
@@ -394,11 +595,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             </button>
           </div>
           
-          {/* Mensagem de ajuda */}
-          <div id="expression-help" className={`text-xs font-medieval text-amber-300/80 mt-1`}> 
+          <div id="expression-help" className="text-xs font-medieval text-amber-300/80 mt-1">
+            Use notação padrão: 1d20, 2d6+3, etc. Powered by Hybrid Multi-Source RNG 🎲
           </div>
           
-          {/* Erro de validação */}
           {validationError && (
             <div 
               id="expression-error"
@@ -413,7 +613,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
 
         {/* Quick Roll Buttons */}
         <div>
-          <label className={`block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2`}>
+          <label className="block text-xs font-medieval font-medium text-amber-400 uppercase tracking-wider mb-2">
+            Rolagens Rápidas
           </label>
           <div className="grid grid-cols-4 gap-2">
             {quickRolls.map((dice) => (
@@ -456,6 +657,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         >
           <div className="flex items-center justify-center gap">
             <Dices size={30} />
+            <span className="text-sm">HÍBRIDO RNG</span>
           </div>
         </LoadingButton>
 
@@ -474,7 +676,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           role="status"
           aria-live="polite"
         >
-          {/* Background glow effect */}
           {showResultGlow && (
             <div 
               className="absolute inset-0 opacity-10 dice-animation" 
@@ -484,8 +685,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
             />
           )}
           
-          <div className={`text-xs font-medieval text-amber-400 uppercase tracking-wider mb-2 relative z-10`}>
-            🔻
+          <div className="text-xs font-medieval text-amber-400 uppercase tracking-wider mb-2 relative z-10">
+            🎲 RESULTADO HÍBRIDO
           </div>
           <div 
             className={`dice-result text-5xl font-extrabold transition-all duration-500 relative z-10 ${showResultGlow ? 'dice-animation' : ''}`}
@@ -532,7 +733,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           <div className="p-4 max-h-48 overflow-y-auto custom-scrollbar">
             {diceHistory.length === 0 ? (
               <p className={`${theme.classes.textSecondary} italic text-sm text-center py-4`}>
-                Nenhuma rolagem
+                Nenhuma rolagem híbrida ainda
               </p>
             ) : (
               <ul className="space-y-2" role="log" aria-label="Histórico">
@@ -542,7 +743,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                     className={`
                       ${theme.classes.textSecondary} text-sm font-mono ${theme.classes.input} p-3 rounded border-l-2 transition-all duration-200
                       ${index === 0 
-                        ? 'border-orange-500/50 bg-white-500/5' 
+                        ? 'border-orange-500/50 bg-orange-500/5' 
                         : `${theme.classes.cardBorder} hover:border-gray-500/50`
                       }
                     `}
@@ -597,11 +798,22 @@ function DiceRoller({ onRollStart, onRollEnd }) {
                   style={{
                     animationDelay: `${i * 0.15}s`,
                     animationDuration: '0.6s',
-                    backgroundColor: 'var(--theme-dice-color)',
-                    boxShadow: '0 0 10px var(--theme-dice-shadow)'
+                    backgroundColor: ['#4ecdc4', '#44a08d', '#ff6b6b', '#f59e0b', '#8b5cf6'][i],
+                    boxShadow: `0 0 10px ${['#4ecdc4', '#44a08d', '#ff6b6b', '#f59e0b', '#8b5cf6'][i]}`
                   }}
                 />
               ))}
+            </div>
+            
+            {/* Indicador de fontes ativas */}
+            <div className="mt-4 text-xs text-gray-400 relative z-10">
+              <div className="flex justify-center space-x-4">
+                <span className="text-green-400">🔐 Crypto</span>
+                <span className="text-blue-400">⚡ XorShift</span>
+                <span className="text-purple-400">🖱️ Mouse</span>
+                <span className="text-yellow-400">⏰ Time</span>
+                <span className="text-red-400">🎲 LCG</span>
+              </div>
             </div>
           </div>
         </div>
@@ -646,6 +858,30 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           to {
             transform: translate(0, 150px) scale(1);
             opacity: 0;
+          }
+        }
+        
+        @keyframes pulse-glow {
+          0%, 100% {
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+          }
+        }
+        
+        @keyframes hybrid-glow {
+          0%, 100% {
+            box-shadow: 0 0 10px #4ecdc4, 0 0 20px #4ecdc4, 0 0 30px #4ecdc4;
+          }
+          25% {
+            box-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b;
+          }
+          50% {
+            box-shadow: 0 0 10px #f59e0b, 0 0 20px #f59e0b, 0 0 30px #f59e0b;
+          }
+          75% {
+            box-shadow: 0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 30px #8b5cf6;
           }
         }
         
