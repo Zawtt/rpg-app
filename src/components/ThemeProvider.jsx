@@ -108,18 +108,18 @@ const themes = {
 },
   
   nature: {
-    name: 'Forest Guardian',
-    description: 'Harmonia da natureza',
+    name: 'Rafinha Theme',
+    description: 'Escuridão',
     classes: {
-      background: 'bg-gradient-to-br from-green-950 via-emerald-900/50 to-teal-950',
-      card: 'bg-emerald-950/80 backdrop-blur-sm border-l-2 border-r-2 border-t-0 border-b-0',
-      cardBorder: 'border-emerald-700/50',
+      background: 'bg-gradient-to-br from-black via-emerald-950 to-black',
+      card: 'bg-slate-950 backdrop-blur-sm border-l-2 border-r-5 border-t-5 border-b-1',
+      cardBorder: 'border-purple-700',
       text: 'text-emerald-100',
       textSecondary: 'text-emerald-200/70',
-      accent: 'text-emerald-400',
-      button: 'bg-gradient-to-r from-emerald-700 to-teal-600 hover:from-emerald-800 hover:to-teal-700',
-      input: 'bg-emerald-950/80 border-emerald-700/50',
-      overlay: 'bg-emerald-950/80'
+      accent: 'text-purple-400',
+      button: 'bg-gradient-to-r from-emerald-900 to-teal-900 hover:from-purple-950 hover:to-teal-900',
+      input: 'bg-gray-900 border-gray-700',
+      overlay: 'bg-gray-900'
     },
     effects: {
       glow1: 'bg-emerald-500/15 shadow-emerald-500/20',
@@ -136,8 +136,8 @@ const themes = {
       active: 'active:scale-95 active:rotate-0'
     },
     dice: {
-      color: 'text-emerald-400',
-      shadow: 'shadow-emerald-500/50',
+      color: 'text-emerald-950',
+      shadow: 'shadow-emerald-950',
       animation: 'animate-bounce'
     }
   },
