@@ -5,8 +5,7 @@ import { useTheme } from './ThemeProvider';
 import { useValidation, useDebounce, useAccessibility, useSounds } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
 
-// Implementação da classe HybridRandomGenerator
-class HybridRandomGenerator {
+class UltraRandomGenerator {
   constructor() {
     // Inicializar estado do XorShift
     this.xorshiftState = Date.now();
@@ -272,8 +271,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const rollingRef = useRef(false);
   const finalResultRef = useRef(null);
   
-  // ✅ NOVA INSTÂNCIA: Gerador híbrido
-  const hybridGenerator = useMemo(() => new HybridRandomGenerator(), []);
+  // ✅ NOVA INSTÂNCIA: Gerador ultra-robusto
+  const hybridGenerator = useMemo(() => new UltraRandomGenerator(), []);
   
   // Hooks
   const { ui, showToast, setLoading } = useAppContext();
@@ -596,7 +595,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           </div>
           
           <div id="expression-help" className="text-xs font-medieval text-amber-300/80 mt-1">
-            Use notação padrão: 1d20, 2d6+3, etc. Powered by Hybrid Multi-Source RNG 🎲
           </div>
           
           {validationError && (
@@ -657,7 +655,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         >
           <div className="flex items-center justify-center gap">
             <Dices size={30} />
-            <span className="text-sm">HÍBRIDO RNG</span>
+            <span className="text-sm"></span>
           </div>
         </LoadingButton>
 
@@ -686,7 +684,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           )}
           
           <div className="text-xs font-medieval text-amber-400 uppercase tracking-wider mb-2 relative z-10">
-            🎲 RESULTADO HÍBRIDO
+            RESULTADO
           </div>
           <div 
             className={`dice-result text-5xl font-extrabold transition-all duration-500 relative z-10 ${showResultGlow ? 'dice-animation' : ''}`}
@@ -712,9 +710,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           <div className={`p-4 border-b ${theme.classes.cardBorder} flex items-center justify-between`}>
             <div className="flex items-center gap-2">
               <History size={16} className={theme.classes.textSecondary} />
-              <h4 className={`text-sm font-medium ${theme.classes.text} uppercase tracking-wider`}>
-                <h3 className="text-2xl font-storm-gust text-white-100 flex items-center gap-3">Histórico</h3>
-              </h4>
+              <h3 className="text-2xl font-storm-gust text-white-100 flex items-center gap-3">Histórico</h3>
               <span className={`text-xs ${theme.classes.textSecondary}`}>
                 ({diceHistory.length}/10)
               </span>
@@ -733,7 +729,7 @@ function DiceRoller({ onRollStart, onRollEnd }) {
           <div className="p-4 max-h-48 overflow-y-auto custom-scrollbar">
             {diceHistory.length === 0 ? (
               <p className={`${theme.classes.textSecondary} italic text-sm text-center py-4`}>
-                Nenhuma rolagem híbrida ainda
+                Nenhuma Rolagem ainda
               </p>
             ) : (
               <ul className="space-y-2" role="log" aria-label="Histórico">
