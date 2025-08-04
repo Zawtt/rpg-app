@@ -70,7 +70,7 @@ const ValidatedInput = React.memo(({
     <div className="relative">
       <label 
         htmlFor={id} 
-        className={`block text-sm font-bold font-medieval mb-1 ${error ? 'text-red-400' : 'text-amber-400'}`}
+        className={`block text-sm font-bold font-medieval mb-1 ${error ? 'text-red-400' : 'text-white'}`}
       >
         {label}:
         {required && <span className="text-red-400 ml-1">*</span>}
@@ -85,9 +85,9 @@ const ValidatedInput = React.memo(({
           w-full p-2 rounded-md focus:outline-none focus:ring-2 transition-all duration-200 font-medieval
           ${error 
             ? 'border-2 border-red-500 bg-red-950/20 focus:ring-red-500' 
-            : 'border border-amber-600/50 bg-gray-900/80 focus:ring-amber-500'
+            : 'border border-amber-600/50 bg-gray-900 focus:ring-purple-500'
           }
-          text-amber-100 placeholder-amber-400/60 ${className}
+          text-white placeholder-gray-400/60 ${className}
         `}
         placeholder={placeholder}
         maxLength={maxLength}
@@ -296,7 +296,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={religion}
         onChange={(e) => updateCharacterField('religion', e.target.value)}
         maxLength={30}
-        placeholder="Crença religiosa"
+        placeholder="Religião"
       />
       <ValidatedInput
         id="height"
@@ -304,7 +304,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={height}
         onChange={(e) => updateCharacterField('height', e.target.value)}
         maxLength={20}
-        placeholder="Ex: 1,75m"
+        placeholder="1,75m"
       />
       <ValidatedInput
         id="race"
@@ -312,7 +312,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={race}
         onChange={(e) => updateCharacterField('race', e.target.value)}
         maxLength={30}
-        placeholder="Raça do personagem"
+        placeholder="Raça"
       />
       <ValidatedInput
         id="age"
@@ -330,7 +330,7 @@ function CharacterSheet({ onFixAttributes }) {
         value={fear}
         onChange={(e) => updateCharacterField('fear', e.target.value)}
         maxLength={50}
-        placeholder="Maior medo"
+        placeholder="Medo"
       />
       <div className="col-span-1 sm:col-span-2">
         <ValidatedInput
@@ -339,7 +339,7 @@ function CharacterSheet({ onFixAttributes }) {
           value={homeland}
           onChange={(e) => updateCharacterField('homeland', e.target.value)}
           maxLength={50}
-          placeholder="Local de origem"
+          placeholder="origem"
         />
       </div>
     </div>

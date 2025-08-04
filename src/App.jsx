@@ -64,20 +64,19 @@ const AnimatedIcon = React.memo(() => (
 const FixedAttributesSidebar = React.memo(({ theme, fixedAttributes, computed }) => (
   <div className={`${theme.classes.card} backdrop-blur-sm rounded-lg border ${theme.classes.cardBorder} shadow-xl sticky top-6`}>
     <div className={`p-4 border-b ${theme.classes.cardBorder}`}>
-      <h3 className="font-semibold font-medieval text-amber-100 flex items-center gap-2">
+      <h3 className="font-semibold font-medieval text-white flex items-center gap-2">
         <AnimatedIcon />
-        <Gamepad2 size={16} className="text-amber-400" />
-        Fixed Stats
+        <Gamepad2 size={20} className="text-white" />
+        Stats
       </h3>
       {computed.hasFixedAttributes && (
-        <div className="text-xs text-amber-400/60 mt-1 font-medieval">
-          {fixedAttributes.length} atributo{fixedAttributes.length !== 1 ? 's' : ''}
+        <div className="text-xs text-white-400/60 mt-1 font-medieval">
         </div>
       )}
     </div>
     <div className="p-4 space-y-2 max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-amber-600/30">
       {!computed.hasFixedAttributes ? (
-        <p className="text-sm text-amber-400/60 italic font-medieval">No fixed attributes</p>
+        <p className="text-sm text-white-400/60 italic font-medieval">No fixed attributes</p>
       ) : (
         fixedAttributes.map((attr, index) => (
           <div 
