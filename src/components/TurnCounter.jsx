@@ -49,8 +49,8 @@ function TurnCounter() {
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center p-2 ${theme.classes.card} rounded-lg shadow-xl border ${theme.classes.cardBorder} w-24 h-24 text-center select-none transform transition-transform duration-200 hover:scale-105 z-20`}>
-      <p className={`${theme.classes.textSecondary} text-xs font-bold uppercase -mb-1`}>Turno</p>
+    <div className={`flex flex-col items-center justify-center p-2 ${theme.classes.card} rounded-lg shadow-xl border ${theme.classes.cardBorder} w-15 h-0 text-center select-none transform transition-transform duration-200 hover:scale-105 z-20`}>
+      <p className={`${theme.classes.textSecondary} text-xs font-bold uppercase -mb-1`}></p>
       <div className={`text-5xl font-extrabold ${theme.classes.accent} leading-none`}>
         {turn}
       </div>
@@ -67,7 +67,7 @@ function TurnCounter() {
           className="bg-red-700 hover:bg-red-600 text-white font-bold px-1.5 py-0.5 rounded-md text-sm transition-colors duration-200"
           title="Reiniciar Turno"
         >
-          Reset
+          
         </button>
         <button
           onClick={incrementTurn}

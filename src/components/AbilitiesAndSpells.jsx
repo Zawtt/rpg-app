@@ -200,8 +200,8 @@ function AbilitiesAndSpells() {
       <div className="abilities-container bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl">
         {/* Header */}
         <div className="p-6 border-b border-gray-800">
-          <h3 className="text-2xl font-medium font-storm-gust text-amber-100 flex items-center gap-3">
-            <Sparkles size={24} className="text-amber-400" />
+          <h3 className="text-2xl font-medium font-storm-gust text-white flex items-center gap-3">
+            <Sparkles size={24} className="text-purple-500" />
             HABILIDADES
           </h3>
           <div className="w-20 h-0.5 bg-purple-500 mt-2"></div>
@@ -311,7 +311,7 @@ function AbilitiesAndSpells() {
           <div className="abilities-list">
             <div className="flex justify-between items-center mb-4">
               <h4 className="text-lg font-medium font-medieval text-amber-100">
-                REGISTRO DE HABILIDADES
+                HABILDADES
               </h4>
               <div className="flex items-center gap-3">
                 <div className="text-sm text-gray-400">

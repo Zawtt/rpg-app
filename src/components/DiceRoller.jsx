@@ -342,8 +342,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-800 shadow-2xl relative overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-800">
-        <h3 className="text-2xl font-storm-gust text-amber-100 flex items-center gap-3">
-          <Dices size={24} className="text-amber-400" />
+        <h3 className="text-2xl font-storm-gust text-white flex items-center gap-3">
+          <Dices size={24} className="text-white" />
           DICE ROLLER
         </h3>
         <div className="w-20 h-0.5 bg-amber-500 mt-2"></div>
