@@ -5,210 +5,124 @@ import { useTheme } from './ThemeProvider';
 import { useValidation, useDebounce, useAccessibility, useSounds } from '../hooks';
 import { LoadingButton } from './LoadingSpinner';
 
-class UltraRandomGenerator {
+// 🎲 NOVO GERADOR SUPER SIMPLES E EFICAZ
+class TrueRandomGenerator {
   constructor() {
-    // Inicializar estado do XorShift
-    this.xorshiftState = Date.now();
+    // Pool de entropia que será constantemente atualizado
+    this.entropyPool = new Uint32Array(16);
+    this.poolIndex = 0;
+    this.lastTime = performance.now();
     
-    // Inicializar estado do LCG (Linear Congruential Generator)
-    this.lcgState = Math.floor(Math.random() * 2147483647);
+    // Inicializar pool com crypto random
+    this.refillEntropyPool();
     
-    // Coletar entropia do sistema
-    this.systemEntropy = {
-      time: Date.now(),
-      memory: performance?.memory?.usedJSHeapSize || 0,
-      timeOrigin: performance.timeOrigin || 0,
-      devicePixelRatio: window.devicePixelRatio || 1,
-      screenSize: (window.screen.width * window.screen.height) || 1000,
-      navigatorData: JSON.stringify(navigator.userAgent).length
-    };
-    
-    // Entropia do mouse
-    this.mouseEntropy = {
-      x: 0,
-      y: 0,
-      timestamp: Date.now()
-    };
-    
-    // Configurar listener para coletar entropia do mouse
-    this.setupMouseEntropyCollection();
+    // Coletar entropia do mouse/teclado
+    this.setupEntropyCollection();
   }
   
-  // Configurar coleta de entropia do mouse
-  setupMouseEntropyCollection() {
-    const updateMouseEntropy = (e) => {
-      this.mouseEntropy = {
-        x: e.clientX,
-        y: e.clientY,
-        timestamp: Date.now()
-      };
-    };
-    
-    window.addEventListener('mousemove', updateMouseEntropy, { passive: true });
-  }
-  
-  // Implementação do algoritmo XorShift
-  nextXorShift() {
-    let x = this.xorshiftState;
-    x ^= x << 13;
-    x ^= x >> 17;
-    x ^= x << 5;
-    this.xorshiftState = x;
-    return (x < 0 ? ~x + 1 : x) % 1000000 / 1000000;
-  }
-  
-  // Implementação do algoritmo LCG
-  nextLCG() {
-    // Parâmetros do LCG (valores comuns para um bom LCG)
-    const a = 1664525;
-    const c = 1013904223;
-    const m = 2147483647; // 2^31 - 1
-    
-    this.lcgState = (a * this.lcgState + c) % m;
-    return this.lcgState / m;
-  }
-  
-  // Obter número aleatório da API Crypto
-  getCryptoRandom() {
+  // Recarregar pool de entropia com crypto.getRandomValues
+  refillEntropyPool() {
     if (window.crypto && window.crypto.getRandomValues) {
-      const array = new Uint32Array(1);
-      window.crypto.getRandomValues(array);
-      return array[0] / 4294967295; // Normalizar para [0, 1)
+      window.crypto.getRandomValues(this.entropyPool);
+    } else {
+      // Fallback para sistemas sem crypto API
+      for (let i = 0; i < this.entropyPool.length; i++) {
+        this.entropyPool[i] = Math.floor(Math.random() * 0xFFFFFFFF);
+      }
     }
-    return Math.random(); // Fallback para Math.random
+    this.poolIndex = 0;
   }
   
-  // Obter entropia do sistema
-  getSystemEntropy() {
-    const now = Date.now();
-    const timeDiff = now - this.systemEntropy.time;
+  // Coletar entropia adicional do usuário
+  setupEntropyCollection() {
+    let mouseEntropy = 0;
     
-    // Atualizar alguns valores de entropia
-    this.systemEntropy.time = now;
+    const addEntropy = (e) => {
+      const now = performance.now();
+      const timeDelta = now - this.lastTime;
+      this.lastTime = now;
+      
+      // Misturar posição do mouse + tempo + delta de tempo
+      mouseEntropy = (mouseEntropy + e.clientX + e.clientY + timeDelta) % 0xFFFFFFFF;
+      
+      // Adicionar ao pool ocasionalmente
+      if (Math.random() < 0.1) { // 10% das vezes
+        this.entropyPool[this.poolIndex] ^= mouseEntropy;
+        this.poolIndex = (this.poolIndex + 1) % this.entropyPool.length;
+      }
+    };
     
-    // Calcular um valor baseado em vários fatores do sistema
-    const entropyValue = (
-      (now % 1000) / 1000 +
-      (timeDiff % 100) / 100 +
-      (performance.now() % 1000) / 1000 +
-      (this.systemEntropy.navigatorData % 1000) / 1000
-    ) / 4;
-    
-    return entropyValue;
+    window.addEventListener('mousemove', addEntropy, { passive: true });
+    window.addEventListener('click', addEntropy, { passive: true });
+    window.addEventListener('keydown', addEntropy, { passive: true });
   }
   
-  // Obter entropia do mouse
-  getMouseEntropy() {
-    const now = Date.now();
-    const timeDiff = now - this.mouseEntropy.timestamp;
-    
-    // Calcular um valor baseado na posição do mouse e tempo
-    return (
-      (this.mouseEntropy.x % 100) / 100 +
-      (this.mouseEntropy.y % 100) / 100 +
-      (timeDiff % 1000) / 1000
-    ) / 3;
-  }
-  
-  // Método principal para obter o próximo número aleatório
+  // Gerar próximo número aleatório
   next() {
-    // Pesos para cada fonte de aleatoriedade
-    const weights = {
-      crypto: 0.35,    // API Crypto (mais forte)
-      xorshift: 0.20,  // XorShift (rápido e bom)
-      lcg: 0.10,       // LCG (complementar)
-      mathRandom: 0.10, // Math.random nativo
-      mouseEntropy: 0.10, // Entropia do mouse
-      timeEntropy: 0.05,  // Entropia do tempo
-      systemEntropy: 0.10  // Entropia do sistema
-    };
-    
-    // Obter valores de cada fonte
-    const sources = {
-      crypto: this.getCryptoRandom(),
-      xorshift: this.nextXorShift(),
-      lcg: this.nextLCG(),
-      mathRandom: Math.random(),
-      mouseEntropy: this.getMouseEntropy(),
-      timeEntropy: (Date.now() % 1000) / 1000,
-      systemEntropy: this.getSystemEntropy()
-    };
-    
-    // Combinar todas as fontes com seus pesos
-    let result = 0;
-    for (const [source, weight] of Object.entries(weights)) {
-      result += sources[source] * weight;
+    // Recarregar pool se necessário
+    if (this.poolIndex >= this.entropyPool.length - 1) {
+      this.refillEntropyPool();
     }
     
-    // Normalizar para garantir que esteja entre [0, 1)
-    return result % 1;
+    // Pegar valor do pool
+    let value = this.entropyPool[this.poolIndex++];
+    
+    // Adicionar entropia extra do tempo atual
+    const timeEntropy = performance.now() * 1000000; // Microsegundos
+    value ^= Math.floor(timeEntropy) % 0xFFFFFFFF;
+    
+    // Aplicar hash simples para quebrar padrões
+    value = this.simpleHash(value);
+    
+    // Normalizar para [0, 1)
+    return (value >>> 0) / 0x100000000;
   }
   
-  // Método para rolar um dado de N lados
+  // Hash simples para quebrar padrões
+  simpleHash(x) {
+    x = ((x >>> 16) ^ x) * 0x45d9f3b;
+    x = ((x >>> 16) ^ x) * 0x45d9f3b;
+    x = (x >>> 16) ^ x;
+    return x;
+  }
+  
+  // Rolar dado de N lados
   rollDice(sides) {
-    return Math.floor(this.next() * sides) + 1;
-  }
-  
-  // Método para testar a qualidade da distribuição
-  testDistribution(sides, iterations = 10000) {
-    const counts = new Array(sides + 1).fill(0);
-    const expected = iterations / sides;
+    // Usar rejection sampling para distribuição uniforme perfeita
+    const max = Math.floor(0x100000000 / sides) * sides;
+    let value;
     
-    // Realizar várias rolagens e contar ocorrências
-    for (let i = 0; i < iterations; i++) {
-      const roll = this.rollDice(sides);
-      counts[roll]++;
-    }
+    do {
+      value = Math.floor(this.next() * 0x100000000);
+    } while (value >= max);
     
-    // Calcular desvio da distribuição ideal
-    let totalDeviation = 0;
-    for (let i = 1; i <= sides; i++) {
-      const deviation = Math.abs(counts[i] - expected) / expected;
-      totalDeviation += deviation;
-    }
-    
-    const avgDeviation = (totalDeviation / sides) * 100;
-    const qualityScore = 100 - avgDeviation;
-    
-    return {
-      counts: counts.slice(1), // Remover o índice 0 que não usamos
-      expected,
-      avgDeviation,
-      qualityScore,
-      iterations
-    };
+    return (value % sides) + 1;
   }
 }
 
-// ✅ CORREÇÃO: Parser seguro para expressões matemáticas
+// ✅ Parser seguro para expressões matemáticas (mantido igual)
 const safeEvaluateExpression = (expression) => {
   try {
-    // Remover espaços e validar caracteres permitidos
     const cleanExpr = expression.replace(/\s/g, '');
     
-    // Verificar se contém apenas números e operadores matemáticos básicos
     if (!/^[0-9+\-*/().]+$/.test(cleanExpr)) {
       throw new Error('Expressão contém caracteres não permitidos');
     }
     
-    // Parser simples e seguro para expressões matemáticas
     const tokens = cleanExpr.match(/(\d+\.?\d*|[+\-*/()])/g);
     if (!tokens) throw new Error('Expressão inválida');
     
-    // Avaliar usando uma pilha (stack-based evaluation)
     return evaluateTokens(tokens);
   } catch (error) {
     throw new Error(`Erro ao avaliar expressão: ${error.message}`);
   }
 };
 
-// Avaliador de tokens seguro
 const evaluateTokens = (tokens) => {
   const outputQueue = [];
   const operatorStack = [];
   const precedence = { '+': 1, '-': 1, '*': 2, '/': 2 };
   
-  // Converter para notação polonesa reversa (RPN)
   for (let token of tokens) {
     if (/^\d+\.?\d*$/.test(token)) {
       outputQueue.push(parseFloat(token));
@@ -218,7 +132,7 @@ const evaluateTokens = (tokens) => {
       while (operatorStack.length && operatorStack[operatorStack.length - 1] !== '(') {
         outputQueue.push(operatorStack.pop());
       }
-      operatorStack.pop(); // Remove '('
+      operatorStack.pop();
     } else if (['+', '-', '*', '/'].includes(token)) {
       while (
         operatorStack.length &&
@@ -235,7 +149,6 @@ const evaluateTokens = (tokens) => {
     outputQueue.push(operatorStack.pop());
   }
   
-  // Avaliar RPN
   const stack = [];
   for (let token of outputQueue) {
     if (typeof token === 'number') {
@@ -256,7 +169,7 @@ const evaluateTokens = (tokens) => {
     }
   }
   
-  return Math.round(stack[0] * 100) / 100; // Arredondar para 2 casas decimais
+  return Math.round(stack[0] * 100) / 100;
 };
 
 function DiceRoller({ onRollStart, onRollEnd }) {
@@ -271,8 +184,8 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const rollingRef = useRef(false);
   const finalResultRef = useRef(null);
   
-  // ✅ NOVA INSTÂNCIA: Gerador ultra-robusto
-  const hybridGenerator = useMemo(() => new UltraRandomGenerator(), []);
+  // 🎲 NOVO GERADOR SIMPLES E EFICAZ
+  const randomGenerator = useMemo(() => new TrueRandomGenerator(), []);
   
   // Hooks
   const { ui, showToast, setLoading } = useAppContext();
@@ -282,15 +195,12 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   const debouncedExpression = useDebounce(expression, 500);
   const theme = useTheme();
 
-  // Cleanup quando componente for desmontado
   useEffect(() => {
     return () => {
-      // Limpar qualquer timer pendente quando o componente for desmontado
       rollingRef.current = false;
     };
   }, []);
 
-  // Validação em tempo real da expressão
   useEffect(() => {
     if (debouncedExpression.trim()) {
       const validation = validateDiceExpression(debouncedExpression);
@@ -300,7 +210,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     }
   }, [debouncedExpression, validateDiceExpression]);
 
-  // ✅ CORREÇÃO: Array estático não precisa de useMemo
   const quickRolls = [
     { label: '1d2', value: '1d2', description: 'Sim ou não' },
     { label: '1d20', value: '1d20', description: 'D20 clássico' },
@@ -308,7 +217,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     { label: '1d100', value: '1d100', description: 'Percentual' },
   ];
 
-  // Função para determinar cor do resultado
   const getResultColorClass = useCallback((value) => {
     const numValue = parseFloat(value);
     if (isNaN(numValue)) return 'text-white';
@@ -318,15 +226,13 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     return 'text-white';
   }, []);
 
-  // ✅ FUNÇÃO PRINCIPAL ATUALIZADA: Usando gerador híbrido
+  // 🎲 FUNÇÃO PRINCIPAL ATUALIZADA COM NOVO GERADOR
   const rollDice = useCallback(async (exprToRoll = expression) => {
-    // Verificar se já está rolando
     if (rollingRef.current) {
       showToast('Aguarde a rolagem anterior terminar', 'warning');
       return;
     }
 
-    // Validar expressão
     const validation = validateDiceExpression(exprToRoll);
     if (!validation.isValid) {
       showToast(validation.error, 'error');
@@ -334,15 +240,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       return;
     }
 
-    // Iniciar processo de rolagem
     rollingRef.current = true;
     setLoading({ rolling: true });
     onRollStart?.();
-
-    // Reproduzir som de rolagem
     playDiceRollSound();
-
-    // Limpar estados anteriores
     setResult(null);
     setShowResultGlow(false);
 
@@ -351,11 +252,10 @@ function DiceRoller({ onRollStart, onRollEnd }) {
     let errorOccurred = false;
 
     try {
-      // ✅ CORREÇÃO: Regex única para dados
-      const diceRegex = /(\d*)d(\d+)/gi; // Com flag 'i' para case-insensitive
+      const diceRegex = /(\d*)d(\d+)/gi;
       let diceRollsDetails = [];
       
-      // ✅ MUDANÇA PRINCIPAL: Usar o gerador híbrido
+      // 🎲 USAR NOVO GERADOR AQUI
       const processedExpression = exprToRoll.replace(diceRegex, (match, numDiceStr, numSidesStr) => {
         const numDice = numDiceStr ? parseInt(numDiceStr, 10) : 1;
         const numSides = parseInt(numSidesStr, 10);
@@ -368,10 +268,9 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         let rollSum = 0;
         let rolls = [];
         
-        // 🎲 AQUI ESTÁ A MÁGICA: Usando o gerador híbrido
+        // ✨ AQUI ESTÁ A MÁGICA: Novo gerador super simples
         for (let i = 0; i < numDice; i++) {
-          // ✨ NOVA LINHA: rollDice() do gerador híbrido
-          const roll = hybridGenerator.rollDice(numSides);
+          const roll = randomGenerator.rollDice(numSides);
           rolls.push(roll);
           rollSum += roll;
         }
@@ -380,24 +279,20 @@ function DiceRoller({ onRollStart, onRollEnd }) {
         return rollSum;
       });
 
-      // Validar expressão processada
       const safeProcessedExpression = processedExpression.replace(/\s/g, '');
       if (!/^[0-9+\-*/().]+$/.test(safeProcessedExpression)) {
         errorOccurred = true;
         throw new Error('Expressão contém caracteres inválidos após processamento dos dados.');
       }
 
-      // Calcular resultado final usando parser seguro
       calculatedResult = safeEvaluateExpression(safeProcessedExpression);
 
-      // Preparar entrada do histórico
       calculatedHistoryEntry = exprToRoll;
       if (diceRollsDetails.length > 0) {
         calculatedHistoryEntry += ` (${diceRollsDetails.join(' + ')})`;  
       }
       calculatedHistoryEntry += ` = ${calculatedResult}`;
 
-      // Anunciar resultado para leitores de tela
       announce(`Resultado da rolagem: ${calculatedResult}`);
 
     } catch (error) {
@@ -410,57 +305,43 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       announce(`Erro na rolagem: ${error.message}`);
     }
 
-    // Iniciar animação de rolagem com números aleatórios
+    // Animação de rolagem
     setAnimatingResult('?');
     setShowAnimationOverlay(true);
     
-    // Gerar números aleatórios para simular rolagem
-    const animationDuration = 2000; // 2 segundos total
-    const updateInterval = 100; // Atualizar a cada 100ms
+    const animationDuration = 2000;
+    const updateInterval = 100;
     const startTime = Date.now();
     
-    // Função para gerar um número aleatório baseado no resultado final
     const generateRandomNumber = () => {
-      // Se o resultado for um número, gerar valores próximos
       if (!isNaN(calculatedResult) && typeof calculatedResult === 'number') {
-        // Quanto mais próximo do fim da animação, mais próximo do resultado real
         const elapsedTime = Date.now() - startTime;
         const progress = Math.min(elapsedTime / animationDuration, 1);
         
-        // No início, números totalmente aleatórios
-        // No fim, números próximos ao resultado
         const randomFactor = 1 - progress;
         const min = Math.max(1, Math.floor(calculatedResult * (1 - randomFactor * 3)));
         const max = Math.ceil(calculatedResult * (1 + randomFactor * 3));
         
-        // ✨ USANDO GERADOR HÍBRIDO PARA ANIMAÇÃO TAMBÉM
+        // ✨ USAR NOVO GERADOR PARA ANIMAÇÃO TAMBÉM
         const animationRange = max - min + 1;
-        return min + hybridGenerator.rollDice(animationRange) - 1;
+        return min + randomGenerator.rollDice(animationRange) - 1;
       }
       
-      // Se não for um número, apenas mostrar o resultado
       return calculatedResult;
     };
     
-    // Iniciar a animação de rolagem
     const animationInterval = setInterval(() => {
       const elapsedTime = Date.now() - startTime;
-      
-      // Atualizar com número aleatório
       setAnimatingResult(generateRandomNumber());
       
-      // Verificar se a animação deve terminar
       if (elapsedTime >= animationDuration - updateInterval) {
         clearInterval(animationInterval);
-        // Mostrar o resultado final na última atualização
         setAnimatingResult(calculatedResult);
       }
     }, updateInterval);
 
-    // Aguardar o término da animação
     await new Promise(resolve => setTimeout(resolve, animationDuration));
 
-    // GARANTIR LIMPEZA
     clearInterval(animationInterval);
     setShowAnimationOverlay(false);
     
@@ -469,25 +350,20 @@ function DiceRoller({ onRollStart, onRollEnd }) {
       setAnimatingResult(null);
       setShowResultGlow(true);
       
-      // Adicionar ao histórico apenas se não houve erro
       if (!errorOccurred) {
         setDiceHistory(prevHistory => [calculatedHistoryEntry, ...prevHistory].slice(0, 10));
       }
       
-      // Cleanup
       rollingRef.current = false;
       setLoading({ rolling: false });
       onRollEnd?.();
-      
-      // Som de aterrissagem dos dados
       playDiceLandSound();
       
-      // Remover glow após um tempo
       setTimeout(() => setShowResultGlow(false), 2000);
       
     }, 100);
 
-  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd, playDiceRollSound, playDiceLandSound, hybridGenerator]);
+  }, [expression, validateDiceExpression, showToast, announce, setLoading, onRollStart, onRollEnd, playDiceRollSound, playDiceLandSound, randomGenerator]);
 
   // Handler para rolagem rápida
   const handleQuickRoll = useCallback((diceValue) => {
@@ -507,7 +383,6 @@ function DiceRoller({ onRollStart, onRollEnd }) {
   // Handler para input da expressão
   const handleExpressionChange = useCallback((e) => {
     const value = e.target.value;
-    // Limitar tamanho da entrada
     if (value.length <= 100) {
       setExpression(value);
     }
